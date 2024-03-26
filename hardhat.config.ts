@@ -1,8 +1,9 @@
 import { HardhatUserConfig } from "hardhat/config";
 import '@oasisprotocol/sapphire-hardhat';
-import "@nomicfoundation/hardhat-ignition-ethers";
-import "@typechain/hardhat";
+
 import "hardhat-deploy";
+import "@nomiclabs/hardhat-ethers";
+import '@typechain/hardhat';
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -18,6 +19,22 @@ const TEST_HDWALLET = {
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : TEST_HDWALLET;
 
 const config: HardhatUserConfig = {
+
+  paths: {
+    artifacts: "artifacts",
+    cache: "cache",
+    deploy: "src/deploy",
+    sources: "contracts",
+    tests: "test"
+  },
+  namedAccounts: {
+    deployer: 0,
+    smartAccountOwner: 1,
+    alice: 2,
+    charlie: 3,
+    sessionKey: 4,
+  },
+
   solidity:{
     version: "0.8.17",
     settings: {

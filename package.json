@@ -1,18 +1,24 @@
 {
-  "name": "hardhat-project",
+  "scripts": {
+    "gen-typechain": "typechain --target ethers-v5 --out-dir contract-types './abis/*.json'"
+  },
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.3"
+  },
+  "devDependencies": {
     "@account-abstraction/contracts": "^0.6.0",
     "@oasisprotocol/sapphire-hardhat": "^2.19.4",
     "@openzeppelin/contracts": "^4.9.3",
-    "@typechain/hardhat": "^9.1.0",
-    "dotenv": "^16.4.5",
-    "hardhat": "^2.22.2",
-    "hardhat-deploy": "^0.12.2"
-  },
-  "devDependencies": {
-    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
-    "@types/node": "^20.11.30",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.3"
+    "@typechain/ethers-v5": "^11.1.2",
+    "@typechain/hardhat": "^7.0.0",
+    "@types/mocha": "^10.0.4",
+    "chai": "^4.3.10",
+    "dotenv": "^16.0.1",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.9.7",
+    "hardhat-deploy": "^0.11.43",
+    "hardhat-deploy-ethers": "^0.3.0-beta.13",
+    "hardhat-gas-reporter": "^1.0.9",
+    "ts-node": "^10.9.2"
   }
 }
