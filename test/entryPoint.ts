@@ -1,20 +1,18 @@
-import { EntryPoint } from "@account-abstraction/contracts"
+import { EntryPoint } from "@account-abstraction/contracts";
 import { getEntryPoint } from "../src/utils/setupHelper";
-
 
 describe("Test EntryPoint ", () => {
     let entrypoint: EntryPoint;
 
-    const setupTests = async() => {
-        entrypoint = (await getEntryPoint());
+    const setupTests = async () => {
+        entrypoint = await getEntryPoint();
     };
 
     before("setup test", async () => {
-        await setupTests()
-       
-    })
+        await setupTests();
+    });
 
-    it ("Deployed successfully", async() =>{
-        console.log(" entrypoint address =  ", entrypoint.address)
-    })
-})
+    it("Deployed successfully", async () => {
+        console.log(" entrypoint address =  ", entrypoint.address);
+    });
+});

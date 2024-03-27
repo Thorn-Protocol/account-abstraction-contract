@@ -99,22 +99,23 @@ contract SmartAccountNoAuth is
     }
 
     /**
-     * @dev Initialize the Smart Account with required states
-     * @param handler Default fallback handler provided in Smart Account
-     * @param moduleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
-     * @param moduleSetupData modules setup data (a standard calldata for the module setup contract)
-     * @notice devs need to make sure it is only callble once by initiazer or state check restrictions
-     * @notice any further implementations that introduces a new state must have a reinit method
-     * @notice reinit is not possible, as _initialSetupModules reverts if the account is already initialized
-     *         which is when there is at least one enabled module
+     * @dev Initialize the Smart Account with required states.
+     * @param handler Default fallback handler for the Smart Account.
+     * @param sessionKeyModuleContract Initializes the session key module
+     * @param authModuleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
+     * @param authModuleSetupData Contains address of the Setup Contract and setup data.
+     * @notice Ensure this is callable only once (use initializer modifier or state checks).
      */
     function init(
         address handler,
-        address moduleSetupContract,
-        bytes calldata moduleSetupData
+        address sessionKeyModuleContract,
+        address authModuleSetupContract,
+        bytes calldata authModuleSetupData
     ) external virtual override returns (address) {
         _setFallbackHandler(handler);
-        return _initialSetupModules(moduleSetupContract, moduleSetupData);
+        _enableModule(sessionKeyModuleContract);
+        return
+            _initialSetupModules(authModuleSetupContract, authModuleSetupData);
     }
 
     /**

@@ -22,14 +22,16 @@ abstract contract BaseSmartAccount is IAccount, BaseSmartAccountErrors {
     /**
      * @dev Initialize the Smart Account with required states.
      * @param handler Default fallback handler for the Smart Account.
-     * @param moduleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
-     * @param moduleSetupData Contains address of the Setup Contract and setup data.
+     * @param sessionKeyModuleContract Initializes the session key module
+     * @param authModuleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
+     * @param authModuleSetupData Contains address of the Setup Contract and setup data.
      * @notice Ensure this is callable only once (use initializer modifier or state checks).
      */
     function init(
         address handler,
-        address moduleSetupContract,
-        bytes calldata moduleSetupData
+        address sessionKeyModuleContract,
+        address authModuleSetupContract,
+        bytes calldata authModuleSetupData
     ) external virtual returns (address);
 
     /**
