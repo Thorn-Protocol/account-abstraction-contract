@@ -1,5 +1,5 @@
 import { EntryPoint } from "@account-abstraction/contracts";
-import { getEntryPoint } from "../src/utils/setupHelper";
+import { getEntryPoint } from "./utils/setupHelper";
 import { ethers, getNamedAccounts } from "hardhat";
 import { Wallet } from "ethers";
 

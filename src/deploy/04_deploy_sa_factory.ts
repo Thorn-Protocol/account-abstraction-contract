@@ -1,6 +1,6 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { getSmartAccountImplementation } from "../utils/setupHelper";
+import { getSmartAccountImplementation } from "../../test/utils/setupHelper";
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -19,5 +19,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-deploy.tags = ["local", "folked-ethereum", "folked-arbitrum"];
+deploy.tags = ["local", "testnet"];
 export default deploy;

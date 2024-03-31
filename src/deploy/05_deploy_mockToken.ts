@@ -1,24 +1,20 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { getEntryPoint } from "../../test/utils/setupHelper";
-
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const entryPoint = await getEntryPoint();
-
-  await deploy("SmartAccount", {
+  await deploy("MockToken", {
     from: deployer,
-    args: [entryPoint.address],
+    args: [],
     log: true,
-    skipIfAlreadyDeployed: true,
     // deterministicDeployment: true,
+    skipIfAlreadyDeployed: true,
     autoMine: true,
   });
 };
 
-deploy.tags = ["local", "testnet"];
+deploy.tags = ["local",  "testnet"];
 export default deploy;

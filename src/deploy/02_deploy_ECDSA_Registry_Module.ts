@@ -22,5 +22,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     
 };
-deploy.tags = ["hardhat", "folked-oasis", "localnet","testnet"];
+deploy.tags = ["hardhat", "localnet","testnet"];
 export default deploy;
