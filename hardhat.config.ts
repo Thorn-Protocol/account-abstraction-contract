@@ -47,7 +47,7 @@ const config: HardhatUserConfig = {
             },
         ],
     },
-    defaultNetwork: "hardhat",
+    defaultNetwork: "sapphire-testnet",
     networks: {
         hardhat: {
             chainId: 31337,
