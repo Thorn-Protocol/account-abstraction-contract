@@ -38,10 +38,21 @@ export const getEcdsaOwnershipRegistryModule = async () => {
 };
 
 
+// export const getSmartAccountFactory = async () => {
+//   const SAFactoryDeployment = await deployments.get("SmartAccountFactory");
+//   console.log("hre = ", await ethers.provider.getBlockNumber());
+//   return SmartAccountFactory__factory.connect(SAFactoryDeployment.address, ethers.provider);
+// };
+
 export const getSmartAccountFactory = async () => {
   const SAFactoryDeployment = await deployments.get("SmartAccountFactory");
-  console.log("hre = ", await ethers.provider.getBlockNumber());
-  return SmartAccountFactory__factory.connect(SAFactoryDeployment.address, ethers.provider);
+  const SmartAccountFactory = await hre.ethers.getContractFactory(
+    "SmartAccountFactory"
+  );
+  const smartAccountFactory = SmartAccountFactory.attach(
+    SAFactoryDeployment.address
+  );
+  return smartAccountFactory;
 };
 
 export const getSmartAccountWithModule = async (
@@ -50,7 +61,7 @@ export const getSmartAccountWithModule = async (
   index: number
 ) => {
   const factory = await getSmartAccountFactory();
- // console.log("factory = ", factory);
+//  console.log("factory = ", factory);
   console.log("factory = ", factory.address, " moduleSetupContract = ", moduleSetupContract, " moduleSetupData", moduleSetupData," index = ", index);
   const  [deployer] = await ethers.getSigners();
   const expectedSmartAccountAddress =

@@ -46,7 +46,7 @@ describe("Modular Smart Account Basics", async () => {
         
       await deployer.sendTransaction({
         to: userSA.address,
-        value: ethers.utils.parseEther("10"),
+        value: ethers.utils.parseEther("0.1"),
       });
       console.log("AA address = ", userSA.address);
       

@@ -43,16 +43,14 @@ contract SmartAccountFactory is Stakeable {
      * @param index extra salt that allows to deploy more accounts if needed for same EOA (default 0)
      */
     function getAddressForCounterFactualAccount(
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData,
+        address moduleSetupContract,
+        bytes calldata moduleSetupData,
         uint256 index
     ) external view returns (address _account) {
         // create initializer data based on init method, _owner and minimalHandler
         bytes memory initializer = _getInitializer(
-            sessionKeyModuleContract,
-            authModuleSetupContract,
-            authModuleSetupData
+            moduleSetupContract,
+            moduleSetupData
         );
         bytes memory code = abi.encodePacked(
             type(Proxy).creationCode,
@@ -68,85 +66,19 @@ contract SmartAccountFactory is Stakeable {
     }
 
     /**
-     * @notice Deploys multiple accounts using create2 and points it to basicImplementation
-     *
-     * @param indexes extra salt that allows to deploy more account if needed for same EOA (default 0)
-     */
-    function deployMultipleCounterFactualAccounts(
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData,
-        uint256[] calldata indexes
-    ) public {
-        // create initializer data based on init method and parameters
-        bytes memory initializer = _getInitializer(
-            sessionKeyModuleContract,
-            authModuleSetupContract,
-            authModuleSetupData
-        );
-
-        bytes memory deploymentData = abi.encodePacked(
-            type(Proxy).creationCode,
-            uint256(uint160(basicImplementation))
-        );
-        for (uint256 i = 0; i < indexes.length; i++) {
-            uint256 index = indexes[i];
-            bytes32 salt = keccak256(
-                abi.encodePacked(keccak256(initializer), index)
-            );
-            address proxy;
-
-            assembly {
-                proxy := create2(
-                    0x0,
-                    add(0x20, deploymentData),
-                    mload(deploymentData),
-                    salt
-                )
-            }
-            require(address(proxy) != address(0), "Create2 call failed");
-
-            address initialAuthorizationModule;
-
-            if (initializer.length > 0) {
-                assembly {
-                    let success := call(
-                        gas(),
-                        proxy,
-                        0,
-                        add(initializer, 0x20),
-                        mload(initializer),
-                        0,
-                        0
-                    )
-                    let ptr := mload(0x40)
-                    returndatacopy(ptr, 0, returndatasize())
-                    if iszero(success) {
-                        revert(ptr, returndatasize())
-                    }
-                    initialAuthorizationModule := mload(ptr)
-                }
-            }
-            emit AccountCreation(proxy, initialAuthorizationModule, index);
-        }
-    }
-
-    /**
      * @notice Deploys account using create2 and points it to basicImplementation
      *
      * @param index extra salt that allows to deploy more account if needed for same EOA (default 0)
      */
     function deployCounterFactualAccount(
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData,
+        address moduleSetupContract,
+        bytes calldata moduleSetupData,
         uint256 index
     ) public returns (address proxy) {
         // create initializer data based on init method and parameters
         bytes memory initializer = _getInitializer(
-            sessionKeyModuleContract,
-            authModuleSetupContract,
-            authModuleSetupData
+            moduleSetupContract,
+            moduleSetupData
         );
         bytes32 salt = keccak256(
             abi.encodePacked(keccak256(initializer), index)
@@ -197,9 +129,8 @@ contract SmartAccountFactory is Stakeable {
      * @return proxy address of the deployed account
      */
     function deployAccount(
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData
+        address moduleSetupContract,
+        bytes calldata moduleSetupData
     ) public returns (address proxy) {
         bytes memory deploymentData = abi.encodePacked(
             type(Proxy).creationCode,
@@ -216,9 +147,8 @@ contract SmartAccountFactory is Stakeable {
         require(address(proxy) != address(0), "Create call failed");
 
         bytes memory initializer = _getInitializer(
-            sessionKeyModuleContract,
-            authModuleSetupContract,
-            authModuleSetupData
+            moduleSetupContract,
+            moduleSetupData
         );
         address initialAuthorizationModule;
 
@@ -254,25 +184,18 @@ contract SmartAccountFactory is Stakeable {
 
     /**
      * @dev Allows to retrieve the initializer data for the account.
-     * @param sessionKeyModuleContract enables session key module
-     * @param authModuleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
-     * @param authModuleSetupData modules setup data (a standard calldata for the module setup contract)
+     * @param moduleSetupContract Initializes the auth module; can be a factory or registry for multiple accounts.
+     * @param moduleSetupData modules setup data (a standard calldata for the module setup contract)
      * @return initializer bytes for init method
      */
     function _getInitializer(
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData
+        address moduleSetupContract,
+        bytes calldata moduleSetupData
     ) internal view returns (bytes memory) {
         return
             abi.encodeCall(
                 BaseSmartAccount.init,
-                (
-                    address(minimalHandler),
-                    sessionKeyModuleContract,
-                    authModuleSetupContract,
-                    authModuleSetupData
-                )
+                (address(minimalHandler), moduleSetupContract, moduleSetupData)
             );
     }
 }

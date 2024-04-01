@@ -84,10 +84,9 @@ contract SmartAccount is
     /**
      * @dev Initialize the Smart Account with required states
      * @param handler Default fallback handler provided in Smart Account
-     * @param sessionKeyModuleContract Contract, that enables session key module
-     * @param authModuleSetupContract Contract, that setups initial auth module for this smart account.
+     * @param moduleSetupContract Contract, that setups initial auth module for this smart account.
      * It can be a module factory or a registry module that serves several smart accounts
-     * @param authModuleSetupData modules setup data (a standard calldata for the module setup contract)
+     * @param moduleSetupData modules setup data (a standard calldata for the module setup contract)
      * @notice devs need to make sure it is only callable once by initializer or state check restrictions
      * @notice any further implementations that introduces a new state must have a reinit method
      * @notice reinitialization is not possible, as _initialSetupModules reverts if the account is already initialized
@@ -95,20 +94,15 @@ contract SmartAccount is
      */
     function init(
         address handler,
-        address sessionKeyModuleContract,
-        address authModuleSetupContract,
-        bytes calldata authModuleSetupData
-    ) external virtual override returns (address authAddress) {
+        address moduleSetupContract,
+        bytes calldata moduleSetupData
+    ) external virtual override returns (address) {
         if (
             _modules[SENTINEL_MODULES] != address(0) ||
             getFallbackHandler() != address(0)
         ) revert AlreadyInitialized();
         _setFallbackHandler(handler);
-        authAddress = _initialSetupModules(
-            authModuleSetupContract,
-            authModuleSetupData
-        );
-        _enableModule(sessionKeyModuleContract);
+        return _initialSetupModules(moduleSetupContract, moduleSetupData);
     }
 
     /**
