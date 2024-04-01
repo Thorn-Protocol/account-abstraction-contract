@@ -66,14 +66,14 @@ const config: HardhatUserConfig = {
             live: true,
             tags: ["testnet"],
         },
-        "sapphire-localnet": {
-            url: "http://localhost:8545",
-            chainId: 0x5afd,
+        'sapphire-localnet': {
+            url: 'http://localhost:8545',
+            tags: ["testnet"],
             accounts: TEST_HDWALLET,
-            tags: ["localnet"],
-        },
+            chainId: 0x5afd
+          },
         folked_oasis: {
-            tags: ["forked-arbitrum"],
+            tags: ["forked-oasis"],
             url: "http://127.0.0.1:9000",
             accounts,
             live: false,

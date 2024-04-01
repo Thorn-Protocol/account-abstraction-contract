@@ -10,8 +10,7 @@ import { getEntryPoint, getSmartAccountImplementation, getSmartAccountFactory, g
 describe("Modular Smart Account Basics", async () => {
     let deployer: SignerWithAddress,
       smartAccountOwner: SignerWithAddress,
-      charlie: SignerWithAddress
-      ;
+      charlie: SignerWithAddress;
   
    // console.log( await ethers.getSigners() );
     // beforeEach(async function () {
@@ -21,11 +20,12 @@ describe("Modular Smart Account Basics", async () => {
     const setupTests =  async () => {
   
       [deployer] = await ethers.getSigners();
-      console.log(" Deployer Address = ", deployer.address) 
-    //  await deployments.fixture();
+      console.log("Deployer Address = ", deployer.address) 
+      //await deployments.fixture();
       const mockToken = await getMockToken();
       const ecdsaModule = await getEcdsaOwnershipRegistryModule();
-      console.log("ecdsaModule = ", ecdsaModule.address)
+      console.log("ecdsaModule = ", ecdsaModule.address);
+      console.log("mockToken = ", mockToken.address);
       const EcdsaOwnershipRegistryModule = await ethers.getContractFactory(
         "EcdsaOwnershipRegistryModule"
       );
@@ -35,7 +35,7 @@ describe("Modular Smart Account Basics", async () => {
           "initForSmartAccount",
           [await deployer.getAddress()]
         );
-      
+      console.log(" data = ", ecdsaOwnershipSetupData);
       const smartAccountDeploymentIndex = 0;
       const userSA = await getSmartAccountWithModule(
         ecdsaModule.address,
