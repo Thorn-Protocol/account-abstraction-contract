@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-ethers";
 import "@typechain/hardhat";
 import "hardhat-deploy";
 import "hardhat-dependency-compiler";
+// import "hardhat-tracer";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -66,12 +67,14 @@ const config: HardhatUserConfig = {
             live: true,
             tags: ["testnet"],
         },
-        'sapphire-localnet': {
-            url: 'http://localhost:8545',
+        "sapphire-localnet": {
+            url: "http://localhost:8545",
             tags: ["testnet"],
             accounts: TEST_HDWALLET,
-            chainId: 0x5afd
-          },
+            chainId: 0x5afd,
+            // gasPrice: 1,
+            blockGasLimit: 1e9,
+        },
         folked_oasis: {
             tags: ["forked-oasis"],
             url: "http://127.0.0.1:9000",
