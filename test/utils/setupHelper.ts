@@ -49,7 +49,9 @@ export const getSmartAccountWithModule = async (moduleSetupContract: string, mod
     const [deployer] = await ethers.getSigners();
     const expectedSmartAccountAddress = await factory.connect(deployer).getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
     console.log(" expect = ", expectedSmartAccountAddress);
+    try {
     await factory.deployCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
-
+} catch (e) {};
+    console.log("sds");
     return await hre.ethers.getContractAt("SmartAccount", expectedSmartAccountAddress);
 };

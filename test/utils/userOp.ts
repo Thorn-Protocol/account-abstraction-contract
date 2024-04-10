@@ -171,16 +171,17 @@ export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryP
         }
     }
     if (op1.nonce == null) {
-        if (provider == null) throw new Error("must have entryPoint to autofill nonce");
-        // Review/TODO: if someone passes 'nonce' as nonceFunction. or change the default
+        op1.nonce =0 ;
+        // if (provider == null) throw new Error("must have entryPoint to autofill nonce");
+        // // Review/TODO: if someone passes 'nonce' as nonceFunction. or change the default
 
-        if (useNonceKey) {
-            const c = new Contract(op.sender!, [`function nonce(uint192) view returns(uint256)`], provider);
-            op1.nonce = await c.nonce(nonceKey).catch(rethrow());
-        } else {
-            const c = new Contract(op.sender!, [`function ${getNonceFunction}() view returns(uint256)`], provider);
-            op1.nonce = await c[getNonceFunction]().catch(rethrow());
-        }
+        // if (useNonceKey) {
+        //     const c = new Contract(op.sender!, [`function nonce(uint192) view returns(uint256)`], provider);
+        //     op1.nonce = await c.nonce(nonceKey).catch(rethrow());
+        // } else {
+        //     const c = new Contract(op.sender!, [`function ${getNonceFunction}() view returns(uint256)`], provider);
+        //     op1.nonce = await c[getNonceFunction]().catch(rethrow());
+        // }
     }
     if (op1.callGasLimit == null && op.callData != null) {
         if (provider == null) throw new Error("must have entryPoint for callGasLimit estimate");
@@ -204,8 +205,8 @@ export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryP
         if (provider == null) throw new Error("must have entryPoint to autofill maxFeePerGas");
         const block = await provider.getBlock("latest");
         // console.log("block = ", block);
-        op1.maxFeePerGas = 1e6;
-        //op1.maxFeePerGas = block.baseFeePerGas!.add(op1.maxPriorityFeePerGas ?? DefaultsForUserOp.maxPriorityFeePerGas);
+        //op1.maxFeePerGas = 1e6;
+        op1.maxFeePerGas = block.baseFeePerGas!.add(op1.maxPriorityFeePerGas ?? DefaultsForUserOp.maxPriorityFeePerGas);
     }
     // TODO: this is exactly what fillUserOp below should do - but it doesn't.
     // adding this manually

@@ -15,13 +15,15 @@ describe("Modular Smart Account Basics", async () => {
     const setupTests = async () => {
         [deployer] = await ethers.getSigners();
         console.log("Deployer Address = ", deployer.address);
-        //await deployments.fixture();
+        await deployments.fixture();
         const mockToken = await getMockToken();
         const ecdsaModule = await getEcdsaOwnershipRegistryModule();
         const EcdsaOwnershipRegistryModule = await ethers.getContractFactory("EcdsaOwnershipRegistryModule");
         const ecdsaOwnershipSetupData = EcdsaOwnershipRegistryModule.interface.encodeFunctionData("initForSmartAccount", [await deployer.getAddress()]);
         const smartAccountDeploymentIndex = 0;
+        console.log("A");
         const userSA = await getSmartAccountWithModule(ecdsaModule.address, ecdsaOwnershipSetupData, smartAccountDeploymentIndex);
+        console.log("B");
         console.log(" userSA = ", userSA.address);
         let nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
         if (Number(nativeInAA) < 10) {

@@ -8,6 +8,9 @@ import "hardhat-dependency-compiler";
 import dotenv from "dotenv";
 dotenv.config();
 
+const { mnemonic } = require('./secrets.json');
+
+
 const TEST_HDWALLET = {
     mnemonic: "test test test test test test test test test test test junk",
     path: "m/44'/60'/0'/0",
@@ -48,47 +51,49 @@ const config: HardhatUserConfig = {
             },
         ],
     },
-    defaultNetwork: "sapphire-testnet",
+    // defaultNetwork: "bsc-testnet",
+    defaultNetwork: "hardhat",
     networks: {
         hardhat: {
             chainId: 31337,
             accounts: TEST_HDWALLET,
             tags: ["hardhat"],
         },
-        sapphire: {
-            url: "https://sapphire.oasis.io",
-            chainId: 0x5afe,
-            accounts,
-        },
-        "sapphire-testnet": {
-            url: "https://testnet.sapphire.oasis.dev",
-            chainId: 0x5aff,
-            accounts,
-            live: true,
-            tags: ["testnet"],
-        },
-        "sapphire-localnet": {
-            url: "http://localhost:8545",
-            tags: ["testnet"],
-            accounts: TEST_HDWALLET,
-            chainId: 0x5afd,
-            // gasPrice: 1,
-            blockGasLimit: 1e9,
-        },
-        "bsc_testnet": {
+        // sapphire: {
+        //     url: "https://sapphire.oasis.io",
+        //     chainId: 0x5afe,
+        //     accounts,
+        // },
+        // "sapphire-testnet": {
+        //     url: "https://testnet.sapphire.oasis.dev",
+        //     chainId: 0x5aff,
+        //     accounts,
+        //     live: true,
+        //     tags: ["testnet"],
+        // },
+        // "sapphire-localnet": {
+        //     url: "http://localhost:8545",
+        //     tags: ["testnet"],
+        //     accounts: TEST_HDWALLET,
+        //     chainId: 0x5afd,
+        //     // gasPrice: 1,
+        //     blockGasLimit: 1e9,
+        // },
+        "bsc-testnet": {
             url: "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
             chainId: 97,
+            tags: ["testnet"],
             gasPrice: 20000000000,
-            // accounts: { mnemonic: process.env.MNEMONIC }
+            accounts: { mnemonic: mnemonic }
         },
 
-        folked_oasis: {
-            tags: ["forked-oasis"],
-            url: "http://127.0.0.1:9000",
-            accounts,
-            live: false,
-            chainId: 31337,
-        },
+        // folked_oasis: {
+        //     tags: ["forked-oasis"],
+        //     url: "http://127.0.0.1:9000",
+        //     accounts,
+        //     live: false,
+        //     chainId: 31337,
+        // },
     },
 };
 

@@ -144,3 +144,5 @@ artifacts
 package-lock.json
 .env
 .vscode
+secrets.json
+deployments/localhost
