@@ -1,4 +1,5 @@
 import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 import { parseEther } from "ethers/lib/utils";
 import {
@@ -83,6 +84,37 @@ export async function deployPaymaster(entryPointAddress: string) {
     console.log("TokenPaymaster deployed to:", paymaster.address);
 }
 
+export async function deployBalanceRegistry() {
+    const balanceRegistryContract = await ethers.getContractFactory("ConfidentialBalanceRegistry");
+    const [signer0] = await ethers.getSigners();
+    const balanceRegistry = await balanceRegistryContract.deploy(
+        signer0.address,
+        signer0.address,
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    );
+    await balanceRegistry.deployed();
+    console.log("BalanceRegistry deployed to:", balanceRegistry.address);
+    return balanceRegistry.address;
+}
+
+// export async function deployPrivateErc20(balanceRegistryAddress: string) {
+//     const config = {
+//         totalSupplyVisible: true,
+//         name: "MockPrivateToken",
+//         symbol: "MPT",
+//         decimals: 18
+//     };
+
+//     const privateErc20Contract = await ethers.getContractFactory("PrivateERC20");
+//     const privateErc20 = await privateErc20Contract.deploy(
+//         config,
+//         "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+//         balanceRegistryAddress
+//     );
+//     await privateErc20.deployed();
+//     console.log("PrivateERC20 deployed to:", privateErc20.address);
+// }
+
 
 async function main() {
     // LOCAL
@@ -92,10 +124,14 @@ async function main() {
     await deploySmartAccountFactory(smartAccountImpl);
     await deployMockToken();
     await deployPaymaster(entryPoint.address);
+    const balanceRegistryAddress = await deployBalanceRegistry();
+    // await deployPrivateErc20(balanceRegistryAddress);
+
 
     // // TESTNET
     // const entryPointAddress = "0xC17D1247914d3B0B2207E21bc434150fA740B939";
     // await deployPaymaster(entryPointAddress);
+    // await deployPrivateErc20();
 }
 
 

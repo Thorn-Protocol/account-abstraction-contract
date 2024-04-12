@@ -12,10 +12,21 @@ export const getEntryPoint = async () => {
     // return EntryPoint__factory.connect(EntryPointDeployment.address, ethers.provider);
 };
 
+export const getBalanceRegistry = async () => {
+    const balanceRegistryDeployment = await deployments.get("ConfidentialBalanceRegistry");
+    const balanceRegistry = await hre.ethers.getContractFactory("ConfidentialBalanceRegistry");
+    return balanceRegistry.attach(balanceRegistryDeployment.address);
+}
+
 export const getMockToken = async () => {
     const MockTokenDeployment = await deployments.get("MockToken");
     const MockToken = await hre.ethers.getContractFactory("MockToken");
     return MockToken.attach(MockTokenDeployment.address);
+};
+export const getMockPrivateToken = async () => {
+    const MockPrivateTokenDeployment = await deployments.get("MockPrivateToken");
+    const MockPrivateToken = await hre.ethers.getContractFactory("MockPrivateToken");
+    return MockPrivateToken.attach(MockPrivateTokenDeployment.address);
 };
 
 export const getSmartAccountImplementation = async () => {

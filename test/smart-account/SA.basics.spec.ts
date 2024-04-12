@@ -1,8 +1,8 @@
 import { deployments, ethers } from "hardhat";
 import { makeEcdsaModuleUserOp, makeEcdsaModuleUserOpWithPaymaster } from "../utils/userOp";
-import { encodeTransfer } from "../utils/testUtils";
+import { encodeTransfer, getBalance } from "../utils/testUtils";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { getEntryPoint, getSmartAccountImplementation, getSmartAccountFactory, getSmartAccountWithModule, getEcdsaOwnershipRegistryModule, getMockToken } from "../utils/setupHelper";
+import { getEntryPoint, getSmartAccountImplementation, getSmartAccountFactory, getSmartAccountWithModule, getEcdsaOwnershipRegistryModule, getMockPrivateToken, getMockToken, getBalanceRegistry } from "../utils/setupHelper";
 import { Wallet } from "ethers";
 import { formatEther, formatUnits } from "ethers/lib/utils";
 
@@ -18,6 +18,10 @@ describe("Modular Smart Account Basics", async () => {
         await deployments.fixture();
         const mockToken = await getMockToken();
         const ecdsaModule = await getEcdsaOwnershipRegistryModule();
+        const entrypoint = await getEntryPoint();
+        // console.log("entrypoint = ", entrypoint.address);
+        const [signer0] = await ethers.getSigners();
+        const balanceRegistry = await getBalanceRegistry();
         const EcdsaOwnershipRegistryModule = await ethers.getContractFactory("EcdsaOwnershipRegistryModule");
         const ecdsaOwnershipSetupData = EcdsaOwnershipRegistryModule.interface.encodeFunctionData("initForSmartAccount", [await deployer.getAddress()]);
         const smartAccountDeploymentIndex = 0;
@@ -41,6 +45,24 @@ describe("Modular Smart Account Basics", async () => {
         }
         amountTokenInAA = formatUnits(await mockToken.balanceOf(userSA.address), await mockToken.decimals());
         console.log(" Amount token in AA = ", amountTokenInAA);
+
+        const mockPrivateToken = await getMockPrivateToken();
+        // allow view balance of private token
+        // call balanceOf function by userSA which is wallet owner
+        let userPrivateTokenBalance = await mockPrivateToken.connect(userSA.address).balanceOf(userSA.address);
+        let amountPrivateTokenInAA = formatUnits(userPrivateTokenBalance, await mockPrivateToken.decimals());
+
+        await balanceRegistry.connect(signer0).commitToken(mockPrivateToken.address);
+
+        // TODO mint by entrypoint
+        if (Number(amountPrivateTokenInAA) < 100) {
+            await mockPrivateToken.connect(signer0).mint(userSA.address, 100 * 1e6);
+        }
+        
+        userPrivateTokenBalance = await mockPrivateToken.connect(userSA.address).balanceOf(userSA.address);
+        amountPrivateTokenInAA = formatUnits(userPrivateTokenBalance, await mockPrivateToken.decimals());
+        console.log(" Amount private token in AA = ", amountPrivateTokenInAA);
+
         return {
             entryPoint: await getEntryPoint(),
             smartAccountImplementation: await getSmartAccountImplementation(),
@@ -48,6 +70,7 @@ describe("Modular Smart Account Basics", async () => {
             mockToken: mockToken,
             ecdsaModule: ecdsaModule,
             userSA: userSA,
+            mockPrivateToken: mockPrivateToken,
         };
     };
 
@@ -80,11 +103,14 @@ describe("Modular Smart Account Basics", async () => {
         let amountTokenInAA = formatUnits(await mockToken.balanceOf(userSA.address), await mockToken.decimals());
         let nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
         console.log(" native Amount before tranfer:", nativeInAA);
+        // TODO 
         console.log(" token Amount before tranfer UserOp", amountTokenInAA);
         const tx = await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 });
         console.log("sending tx to entrypoint........");
         try {
             //  console.log("Tx = ", (await tx.wait()).events!);
+            // const txReceipt = await tx.wait();
+            // console.log("Tx = ", txReceipt);
             console.log("Tx = ", (await tx.wait()).transactionHash);
         } catch (e) {
             console.log(" error sending Tx");
@@ -98,6 +124,47 @@ describe("Modular Smart Account Basics", async () => {
         // expect(await mockToken.balanceOf(charlie.address)).to.equal(
         //   charlieTokenBalanceBefore.add(tokenAmountToTransfer)
         // );
+    }).timeout(200000);
+
+    it("Can send a PrivateERC20 Transfer userOp", async () => {
+        const { entryPoint, mockPrivateToken, userSA, ecdsaModule } = await setupTests();
+        //   const charlieTokenBalanceBefore = await mockToken.balanceOf(charlie.address);
+        const userOp = await makeEcdsaModuleUserOp(
+            "execute_ncC",
+            [mockPrivateToken.address, ethers.utils.parseEther("0"), encodeTransfer(deployer.address, 50 * 1e6)],
+            userSA.address,
+            deployer,
+            entryPoint,
+            ecdsaModule.address,
+            {
+                preVerificationGas: 50000,
+            }
+        );
+
+        const beneficiaryAddress = "0x".padEnd(42, "1");
+        let userPrivateTokenBalance = await mockPrivateToken.connect(userSA.address).balanceOf(userSA.address);
+        let amountPrivateTokenInAA = formatUnits(userPrivateTokenBalance, await mockPrivateToken.decimals());
+
+        let nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
+        console.log(" native Amount before tranfer:", nativeInAA);
+        console.log(" token Amount before tranfer UserOp", amountPrivateTokenInAA);
+        const tx = await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 });
+        console.log("sending tx to entrypoint........");
+        try {
+            //  console.log("Tx = ", (await tx.wait()).events!);
+            console.log("Tx = ", (await tx.wait()).transactionHash);
+            // const txReceipt = await tx.wait();
+            // console.log("Tx = ", txReceipt);
+
+        } catch (e) {
+            console.log(" error sending Tx");
+        }
+        userPrivateTokenBalance = await mockPrivateToken.connect(userSA.address).balanceOf(userSA.address);
+        amountPrivateTokenInAA = formatUnits(userPrivateTokenBalance, await mockPrivateToken.decimals());        
+        nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
+
+        console.log(" native Amount after tranfer:", nativeInAA);
+        console.log(" token Amount after tranfer UserOp", amountPrivateTokenInAA);
     }).timeout(200000);
 
     it("Can send a Native Token Transfer userOp", async () => {

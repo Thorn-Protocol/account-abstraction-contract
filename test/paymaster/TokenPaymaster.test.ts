@@ -7,6 +7,8 @@ import {
     SimpleAccountFactory__factory,
     TestERC20,
     TestERC20__factory,
+    PrivateERC20,
+    PrivateERC20__factory,
     TestQuoterV2,
     TestQuoterV2__factory,
     TestUniswapRoute,
@@ -52,6 +54,7 @@ describe("TokenPaymaster", function () {
     let paymasterOwner: string;
     let callData: string;
     let token: TestERC20;
+    let privateToken: PrivateERC20;
 
     let weth: TestWrappedNativeToken;
 
