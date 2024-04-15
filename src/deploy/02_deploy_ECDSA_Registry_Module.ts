@@ -5,11 +5,6 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
-    // await deploy("EcdsaOwnershipRegistryModule", {
-    //     from: deployer,
-    //     args: [],
-    //     log: true,
-    // });
 
     await deploy("EcdsaOwnershipRegistryModule", {
         from: deployer,
@@ -18,9 +13,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         // deterministicDeployment: true,
         skipIfAlreadyDeployed: true,
         autoMine: true,
-      });
-
-    
+    });
 };
-deploy.tags = ["hardhat", "localnet","testnet"];
+deploy.tags = ["hardhat", "sapphire-localnet", "sapphire-testnet", "bsc-testnet"];
 export default deploy;

@@ -1,21 +1,18 @@
 import { deployments, ethers } from "hardhat";
-import { makeEcdsaModuleUserOp, makeEcdsaModuleUserOpWithPaymaster } from "../utils/userOp";
-import { encodeTransfer } from "../utils/testUtils";
+import { makeEcdsaModuleUserOp, makeEcdsaModuleUserOpWithPaymaster } from "../../src/utils/userOp";
+import { encodeTransfer } from "../../src/utils/testUtils";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { getEntryPoint, getSmartAccountImplementation, getSmartAccountFactory, getSmartAccountWithModule, getEcdsaOwnershipRegistryModule, getMockToken } from "../utils/setupHelper";
-import { Wallet } from "ethers";
+import { getEntryPoint, getSmartAccountImplementation, getSmartAccountFactory, getSmartAccountWithModule, getEcdsaOwnershipRegistryModule, getMockToken } from "../../src/utils/setupHelper";
+
 import { formatEther, formatUnits } from "ethers/lib/utils";
 
 describe("Modular Smart Account Basics", async () => {
     let deployer: SignerWithAddress, smartAccountOwner: SignerWithAddress, charlie: SignerWithAddress;
-    // console.log( await ethers.getSigners() );
-    // beforeEach(async function () {
-    //  [deployer] = await ethers.getSigners();
-    // });
+
     const setupTests = async () => {
         [deployer] = await ethers.getSigners();
         console.log("Deployer Address = ", deployer.address);
-        //await deployments.fixture();
+        await deployments.fixture();
         const mockToken = await getMockToken();
         const ecdsaModule = await getEcdsaOwnershipRegistryModule();
         const EcdsaOwnershipRegistryModule = await ethers.getContractFactory("EcdsaOwnershipRegistryModule");
@@ -110,7 +107,7 @@ describe("Modular Smart Account Basics", async () => {
         console.log("sending tx to entrypoint........");
         const tx = await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 });
         try {
-            //   console.log("Tx = ", (await tx.wait()).events!);
+            //console.log("Tx = ", (await tx.wait()).events!);
             console.log("Tx = ", (await tx.wait()).transactionHash);
         } catch (e) {
             console.log(" error sending Tx");

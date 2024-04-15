@@ -1,20 +1,22 @@
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { getKeyManagementImplementation } from "../utils/setupHelper";
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
-    console.log(" asdada ");
-    await deploy("MockToken", {
+
+    const smartAccountImplementation = await getKeyManagementImplementation();
+
+    await deploy("KeyManagementFactory", {
         from: deployer,
-        args: [],
+        args: [smartAccountImplementation.address],
         log: true,
-        //deterministicDeployment: true,
         skipIfAlreadyDeployed: true,
         autoMine: true,
     });
 };
-
-deploy.tags = ["sapphire-localnet", "sapphire-testnet"];
+deploy.tags = ["hardhat", "sapphire-testnet", "sapphire-localnet"];
 export default deploy;

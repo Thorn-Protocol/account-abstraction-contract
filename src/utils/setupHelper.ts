@@ -1,7 +1,7 @@
 import { EntryPoint__factory } from "@account-abstraction/contracts";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
 import { deployments, ethers } from "hardhat";
-import { SmartAccount__factory, SmartAccountFactory__factory } from "../../typechain-types";
+import { KeyManagement__factory, SmartAccount__factory, SmartAccountFactory__factory } from "../../typechain-types";
 import { BytesLike } from "ethers";
 import hre from "hardhat";
 
@@ -52,4 +52,9 @@ export const getSmartAccountWithModule = async (moduleSetupContract: string, mod
     await factory.deployCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
 
     return await hre.ethers.getContractAt("SmartAccount", expectedSmartAccountAddress);
+};
+
+export const getKeyManagementImplementation = async () => {
+    const KeyManagementImplDeployment = await deployments.get("KeyManagement");
+    return KeyManagement__factory.connect(KeyManagementImplDeployment.address, ethers.provider);
 };

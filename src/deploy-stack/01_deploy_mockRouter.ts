@@ -5,8 +5,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
     const { deploy } = deployments;
     const { deployer } = await getNamedAccounts();
-    console.log(" asdada ");
-    await deploy("MockToken", {
+
+    await deploy("MockLuminexRouterV1", {
         from: deployer,
         args: [],
         log: true,
@@ -16,5 +16,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     });
 };
 
-deploy.tags = ["sapphire-localnet", "sapphire-testnet"];
+deploy.tags = ["sapphire-localnet"];
 export default deploy;

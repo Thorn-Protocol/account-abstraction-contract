@@ -6,6 +6,7 @@
     "dependencies": {
         "@nomicfoundation/ethereumjs-vm": "^7.0.4",
         "@nomiclabs/hardhat-ethers": "^2.2.3",
+        "@oasisprotocol/sapphire-contracts": "^0.2.8",
         "@uniswap/v3-periphery": "^1.4.4",
         "hardhat": "^2.19.2",
         "hardhat-dependency-compiler": "^1.1.3",

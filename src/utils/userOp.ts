@@ -5,7 +5,7 @@ import { BigNumber, BigNumberish, Contract, Signer, Wallet } from "ethers";
 import { EntryPoint } from "@account-abstraction/contracts";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ecsign, toRpcSig, keccak256 as keccak256Buffer } from "ethereumjs-util";
-import { Create2Factory } from "../../src/Create2Factory";
+import { Create2Factory } from "../Create2Factory";
 import { ethers } from "hardhat";
 import { MerkleTree } from "merkletreejs";
 export function packUserOp(op: UserOperation, forSignature = true): string {
