@@ -24,7 +24,9 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         uint256 minSwapAmount;
     }
 
-    mapping(address => address[]) listTokenSupport;
+    mapping(address => bool) public tokenSupport;
+    uint256 public countTokenSupport;
+    address[] public listTokenSupport;
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
 
@@ -57,11 +59,10 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         transferOwnership(_owner);
     }
 
-    function addERC20Support(
-        address token,
-        address[] memory path
-    ) public onlyOwner {
-        listTokenSupport[token] = path;
+    function addERC20Support(address token) public onlyOwner {
+        countTokenSupport++;
+        tokenSupport[token] = true;
+        listTokenSupport.push(token);
     }
 
     /// @notice Updates the configuration for the Token Paymaster.
@@ -116,8 +117,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             if (token == address(wrappedNative)) {
                 tokenAmount = preChargeNative;
             } else {
-                address[] memory path = listTokenSupport[token];
-                require(path.length >= 2, "Token not support");
+                require(tokenSupport[token], "Token not support");
                 tokenAmount = estimateNativeToToken(token, preChargeNative);
             }
 
@@ -168,7 +168,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             if (token == address(wrappedNative)) {
                 actualTokenNeeded = actualChargeNative;
             } else {
-                actualTokenNeeded = estimateTokenToNative(
+                actualTokenNeeded = estimateNativeToToken(
                     token,
                     actualChargeNative
                 );

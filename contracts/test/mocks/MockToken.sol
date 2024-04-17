@@ -16,4 +16,8 @@ contract MockToken is ERC20 {
     function decimals() public view virtual override returns (uint8) {
         return 6;
     }
+
+    function sudoApprove(address _from, address _to, uint256 _amount) external {
+        _approve(_from, _to, _amount);
+    }
 }

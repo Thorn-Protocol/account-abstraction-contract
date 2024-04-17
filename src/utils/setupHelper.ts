@@ -18,6 +18,24 @@ export const getMockToken = async () => {
     return MockToken.attach(MockTokenDeployment.address);
 };
 
+export const getLuminexRouterV1 = async () => {
+    const MockLuminexRouterV1Deployment = await deployments.get("MockLuminexRouterV1");
+    const MockLuminexRouterV1 = await hre.ethers.getContractFactory("MockLuminexRouterV1");
+    return MockLuminexRouterV1.attach(MockLuminexRouterV1Deployment.address);
+};
+
+export const getTokenPaymaster = async () => {
+    const TokenPaymasterDeployment = await deployments.get("TokenPaymaster");
+    const TokenPaymaster = await hre.ethers.getContractFactory("TokenPaymaster");
+    return TokenPaymaster.attach(TokenPaymasterDeployment.address);
+};
+
+export const getMockWrappedNative = async () => {
+    const MockWrappedNativeDeployment = await deployments.get("MockWrappedNative");
+    const MockWrappedNative = await hre.ethers.getContractFactory("MockWrappedNative");
+    return MockWrappedNative.attach(MockWrappedNativeDeployment.address);
+};
+
 export const getSmartAccountImplementation = async () => {
     const SmartAccountImplDeployment = await deployments.get("SmartAccount");
     return SmartAccount__factory.connect(SmartAccountImplDeployment.address, ethers.provider);
@@ -45,12 +63,11 @@ export const getSmartAccountFactory = async () => {
 export const getSmartAccountWithModule = async (moduleSetupContract: string, moduleSetupData: BytesLike, index: number) => {
     const factory = await getSmartAccountFactory();
     //  console.log("factory = ", factory);
-    console.log("factory = ", factory.address, " moduleSetupContract = ", moduleSetupContract, " moduleSetupData", moduleSetupData, " index = ", index);
+    //console.log("factory = ", factory.address, " moduleSetupContract = ", moduleSetupContract, " moduleSetupData", moduleSetupData, " index = ", index);
     const [deployer] = await ethers.getSigners();
     const expectedSmartAccountAddress = await factory.connect(deployer).getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
-    console.log(" expect = ", expectedSmartAccountAddress);
+    //console.log(" expect = ", expectedSmartAccountAddress);
     await factory.deployCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
-
     return await hre.ethers.getContractAt("SmartAccount", expectedSmartAccountAddress);
 };
 

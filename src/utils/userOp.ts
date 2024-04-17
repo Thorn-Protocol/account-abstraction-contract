@@ -1,4 +1,4 @@
-import { arrayify, BytesLike, defaultAbiCoder, hexConcat, hexDataSlice, hexValue, hexZeroPad, keccak256 } from "ethers/lib/utils";
+import { arrayify, BytesLike, defaultAbiCoder, hexConcat, hexDataSlice, hexlify, hexValue, hexZeroPad, keccak256 } from "ethers/lib/utils";
 import { UserOperation } from "./userOperation";
 import { AddressZero, callDataCost, rethrow } from "./testUtils";
 import { BigNumber, BigNumberish, Contract, Signer, Wallet } from "ethers";
@@ -204,7 +204,7 @@ export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryP
         if (provider == null) throw new Error("must have entryPoint to autofill maxFeePerGas");
         const block = await provider.getBlock("latest");
         // console.log("block = ", block);
-        op1.maxFeePerGas = 1e6;
+        op1.maxFeePerGas = 100e9;
         //op1.maxFeePerGas = block.baseFeePerGas!.add(op1.maxPriorityFeePerGas ?? DefaultsForUserOp.maxPriorityFeePerGas);
     }
     // TODO: this is exactly what fillUserOp below should do - but it doesn't.
@@ -289,9 +289,7 @@ export async function makeEcdsaModuleUserOpWithPaymaster(
     entryPoint: EntryPoint,
     moduleAddress: string,
     paymaster: Contract,
-    verifiedSigner: Wallet | SignerWithAddress,
-    validUntil: number,
-    validAfter: number,
+    paymasterToken: Contract,
     options?: {
         preVerificationGas?: number;
     },
@@ -315,16 +313,13 @@ export async function makeEcdsaModuleUserOpWithPaymaster(
         0
     );
 
-    const hash = await paymaster.getHash(userOp, verifiedSigner.address, validUntil, validAfter);
-    const paymasterSig = await verifiedSigner.signMessage(arrayify(hash));
+    // const hash = await paymaster.getHash(userOp, verifiedSigner.address, validUntil, validAfter);
+    //   const paymasterSig = await verifiedSigner.signMessage(arrayify(hash));
     const userOpWithPaymasterData = await fillAndSign(
         {
             // eslint-disable-next-line node/no-unsupported-features/es-syntax
             ...userOp,
-            paymasterAndData: hexConcat([
-                paymaster.address,
-                ethers.utils.defaultAbiCoder.encode(["address", "uint48", "uint48", "bytes"], [verifiedSigner.address, validUntil, validAfter, paymasterSig]),
-            ]),
+            paymasterAndData: hexConcat([paymaster.address, hexZeroPad(hexlify(3e5, { hexPad: "left" }), 16), hexZeroPad(hexlify(3e5, { hexPad: "left" }), 16), paymasterToken.address]),
         },
         userOpSigner,
         entryPoint,

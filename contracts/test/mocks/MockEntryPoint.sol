@@ -1,3 +1,3 @@
 import "@account-abstraction/contracts/core/EntryPoint.sol";
 
-contract MockEntryPoint is EntryPoint{}
+contract MockEntryPoint is EntryPoint {}

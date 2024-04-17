@@ -20,7 +20,7 @@ contract MockLuminexRouterV1 {
         address to,
         uint deadline
     ) external returns (uint[] memory amounts) {
-        safeTransferNative(msg.sender, amountIn / 1e9);
+        safeTransferNative(msg.sender, amountIn / 1e12);
     }
 
     function getAmountsOut(
@@ -30,12 +30,13 @@ contract MockLuminexRouterV1 {
         uint[] memory result = new uint[](2);
         if (path[0] == wrappedNative) {
             result[0] = amountIn;
-            result[1] = amountIn / 1e9;
+            result[1] = amountIn / 1e12;
         }
         if (path[1] == wrappedNative) {
             result[0] = amountIn;
-            result[1] = amountIn * 1e9;
+            result[1] = amountIn * 1e12;
         }
+
         return result;
     }
 
