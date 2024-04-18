@@ -25,6 +25,9 @@ abstract contract LuminexSwapHelper {
         wrappedNative = _wrappnative;
     }
 
+    /// @notice estimate ERC20 token receive in exchange with amountIn of native token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of native token
     function estimateNativeToToken(
         address token,
         uint256 amountIn
@@ -37,6 +40,9 @@ abstract contract LuminexSwapHelper {
         amountOut = result[1];
     }
 
+    /// @notice estimate native token receive in exchange with amountIn of ERC20 token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of ERC20 token
     function estimateTokenToNative(
         address token,
         uint256 amountIn
@@ -49,6 +55,9 @@ abstract contract LuminexSwapHelper {
         amountOut = result[1];
     }
 
+    /// @notice swap native token to ERC20 token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of native token
     function _swapTokenToNative(address token, uint256 amountIn) internal {
         address[] memory path = new address[](2);
         path[0] = token;
@@ -62,6 +71,7 @@ abstract contract LuminexSwapHelper {
         );
     }
 
+    /// @notice unwrap WETH by withdrawing
     function unwrapWeth(uint256 amount) internal {
         IWETH(address(wrappedNative)).withdraw(amount);
     }

@@ -20,10 +20,11 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     struct TokenPaymasterConfig {
         /// @notice Estimated gas cost for refunding tokens after the transaction is completed
         uint48 refundPostopCost;
-        /// @notice
+        /// @notice Expected minimum amount of native tokens to be exchanged in a ERC20 to native token swap when refill EntryPoint deposit
         uint256 minSwapAmount;
     }
 
+    // List of supported ERC20 tokens to be used for charging gas fees
     mapping(address => bool) public tokenSupport;
     uint256 public countTokenSupport;
     address[] public listTokenSupport;
@@ -97,7 +98,10 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     )
         internal
         override
-        returns (bytes memory context, uint256 validationResult)
+        returns (
+            bytes memory context,
+            uint256 validationResult
+        )
     {
         unchecked {
             uint256 maxFeePerGas = userOp.maxFeePerGas;
@@ -165,8 +169,10 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
 
             uint256 actualTokenNeeded = 0;
 
+            // if the token is wrapped native token, the actual token needed is the actual native token charged
             if (token == address(wrappedNative)) {
                 actualTokenNeeded = actualChargeNative;
+                // otherwise, estimate the token needed using router helper
             } else {
                 actualTokenNeeded = estimateNativeToToken(
                     token,
@@ -204,6 +210,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
 
     /// @notice If necessary this function uses this Paymaster's token balance to refill the deposit on EntryPoint
     function refillEntryPointDeposit(address token) private {
+        // if the ERC20 token is wrapped native token and paymaster's balance of that token is greater than minSwapAmount, unwrap and deposit to entry point
         if (address(token) == address(wrappedNative)) {
             if (
                 IERC20(token).balanceOf(address(this)) >
@@ -215,6 +222,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 );
             }
         } else {
+            // if the ERC20 token is not wrapped native token and paymaster's balance of that token is greater than minSwapAmount, swap and deposit to entry point
             uint256 tokenBalance = IERC20(token).balanceOf(address(this));
 
             uint256 estimateReceiveNative = estimateTokenToNative(
@@ -231,6 +239,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         emit Received(msg.sender, msg.value);
     }
 
+    /// @notice For contract owner to withdraw ETH from the contract
     function withdrawEth(
         address payable recipient,
         uint256 amount
