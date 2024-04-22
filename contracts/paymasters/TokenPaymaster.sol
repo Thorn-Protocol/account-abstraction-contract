@@ -222,8 +222,12 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 tokenBalance
             );
 
-            if (estimateReceiveNative > tokenPaymasterConfig.minSwapAmount)
+            if (estimateReceiveNative > tokenPaymasterConfig.minSwapAmount) {
                 _swapTokenToNative(token, tokenBalance);
+                entryPoint.depositTo{value: address(this).balance}(
+                    address(this)
+                );
+            }
         }
     }
 

@@ -1,53 +1,132 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.17;
 
-import {SignatureRSV, EthereumUtils} from "@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol";
-import {Sapphire} from "@oasisprotocol/sapphire-contracts/contracts/Sapphire.sol";
+import "./interfaces/IKeyManagementAuthorizationModule.sol";
 
-contract KeyManagement {
+import {SignatureRSV, EthereumUtils} from "@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol";
+import {UserOperation} from "@account-abstraction/contracts/interfaces/UserOperation.sol";
+import {Sapphire} from "@oasisprotocol/sapphire-contracts/contracts/Sapphire.sol";
+import {BaseAuthorizationModule} from "../BaseAuthorizationModule.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
+contract KeyManagement is BaseAuthorizationModule {
+    using ECDSA for bytes32;
+
+    address internal constant SENTINEL_MODULES = address(0x1);
+
+    mapping(address => address) internal _modules;
+    mapping(address => address) internal publicAddress;
+    mapping(address => bytes32) private privateSecret;
+
     bool private _initialized;
-    bool private _initPassword;
-    string private _password;
-    address public owner;
-    address public keypairAddress;
-    bytes32 private keypairSecret;
+
+    error WrongValidationModule(address validationModule);
 
     constructor() {}
 
-    function init(address _owner) external returns (address) {
+    function initForSmartAccount(address _owner) external returns (address) {
         require(!_initialized, "AlreadyInitialized");
-        owner = _owner;
+        address keypairAddress;
+        bytes32 keypairSecret;
         (keypairAddress, keypairSecret) = EthereumUtils.generateKeypair();
-        _initialized = true;
-        return owner;
+        publicAddress[_owner] = keypairAddress;
+        privateSecret[_owner] = keypairSecret;
+        return address(this);
     }
 
-    function setPassword(string calldata password) public onlyOwner {
-        _password = password;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only Owner");
+    modifier onlyOwner(bytes calldata data) {
+        (, address validationModule) = abi.decode(data, (bytes, address));
+        if (_modules[validationModule] != address(0)) {
+            require(
+                IKeyManagementAuthorizationModule(validationModule).validate(
+                    data
+                ) == true,
+                "Validate wrong"
+            );
+        } else {
+            revert WrongValidationModule(validationModule);
+        }
         _;
     }
 
     function sign(
+        bytes calldata authenticationData,
+        address smartAccount,
         bytes32 digest
-    ) public view onlyOwner returns (SignatureRSV memory) {
-        return EthereumUtils.sign(keypairAddress, keypairSecret, digest);
+    )
+        public
+        view
+        returns (
+            // onlyOwner(authenticationData, smartAccount)
+            SignatureRSV memory
+        )
+    {
+        return
+            EthereumUtils.sign(
+                publicAddress[smartAccount],
+                privateSecret[smartAccount],
+                digest
+            );
     }
 
-    // function verify(
-    //     bytes memory contextOrHash,
-    //     bytes memory message,
-    //     bytes memory signature
-    // ) public view returns (bool verify) {
-    //     verify = Sapphire.verify(
-    //         Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,
-    //         bytes(keypairAddress),
-    //         contextOrHash,
-    //         "",
-    //         signature
-    //     );
-    // }
+    function validateUserOp(
+        UserOperation calldata userOp,
+        bytes32 userOpHash
+    ) external view virtual returns (uint256) {
+        (bytes memory cleanEcdsaSignature, ) = abi.decode(
+            userOp.signature,
+            (bytes, address)
+        );
+        if (_verifySignature(userOpHash, cleanEcdsaSignature, userOp.sender)) {
+            return VALIDATION_SUCCESS;
+        }
+        return SIG_VALIDATION_FAILED;
+    }
+
+    function isValidSignature(
+        bytes32 dataHash,
+        bytes memory moduleSignature
+    ) public view override returns (bytes4) {
+        return
+            isValidSignatureForAddress(dataHash, moduleSignature, msg.sender);
+    }
+
+    function isValidSignatureForAddress(
+        bytes32 dataHash,
+        bytes memory moduleSignature,
+        address smartAccount
+    ) public view virtual returns (bytes4) {
+        if (_verifySignature(dataHash, moduleSignature, smartAccount)) {
+            return EIP1271_MAGIC_VALUE;
+        }
+        return bytes4(0xffffffff);
+    }
+
+    function _verifySignature(
+        bytes32 dataHash,
+        bytes memory signature,
+        address smartAccount
+    ) internal view returns (bool) {
+        address keypairAddress = publicAddress[smartAccount];
+        address recovered = (dataHash.toEthSignedMessageHash()).recover(
+            signature
+        );
+        if (keypairAddress == recovered) {
+            return true;
+        }
+        recovered = dataHash.recover(signature);
+        if (keypairAddress == recovered) {
+            return true;
+        }
+        return false;
+    }
 }
+
+// bool verify = Sapphire.verify(
+//     Sapphire.SigningAlg.Secp256k1PrehashedKeccak256,
+//     bytes(keypairAddress),
+//     dataHash,
+//     "",
+//     signature
+// );
+// return verify;

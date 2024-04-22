@@ -1,0 +1,134 @@
+{
+  "address": "0x3e16F69B369A63F726f873448B998C7ac08c6315",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_wrappedNative",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "path",
+          "type": "address[]"
+        }
+      ],
+      "name": "getAmountsOut",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "amounts",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOutMin",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address[]",
+          "name": "path",
+          "type": "address[]"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapExactTokensForROSE",
+      "outputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "amounts",
+          "type": "uint256[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "wrappedNative",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0x819994742d105a9e05f7b7b1a147d099041d6fcb12b8e1b6121022f4a0ad4efc",
+  "receipt": {
+    "to": null,
+    "from": "0x2F459030f95Be9CeeA722cD207F323bd648F65D0",
+    "contractAddress": "0x3e16F69B369A63F726f873448B998C7ac08c6315",
+    "transactionIndex": 1,
+    "gasUsed": "290639",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x515b19d63273cdc0bdae2c7eb823867ebc1d6fc071159c6e4bd63154529465b3",
+    "transactionHash": "0x819994742d105a9e05f7b7b1a147d099041d6fcb12b8e1b6121022f4a0ad4efc",
+    "logs": [],
+    "blockNumber": 5851777,
+    "cumulativeGasUsed": "312782",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x8ab7B0c47f07E19C86E35Ebb44453cB266d1E79c"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "a7728b655854f47f462e195a1cc2149b",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_wrappedNative\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"path\",\"type\":\"address[]\"}],\"name\":\"getAmountsOut\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"address[]\",\"name\":\"path\",\"type\":\"address[]\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"deadline\",\"type\":\"uint256\"}],\"name\":\"swapExactTokensForROSE\",\"outputs\":[{\"internalType\":\"uint256[]\",\"name\":\"amounts\",\"type\":\"uint256[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wrappedNative\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/test/mocks/MockLuminexV1Route.sol\":\"MockLuminexRouterV1\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":800},\"remappings\":[],\"viaIR\":true},\"sources\":{\"contracts/test/mocks/MockLuminexV1Route.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.17;\\n\\ncontract MockLuminexRouterV1 {\\n    address public immutable wrappedNative;\\n\\n    constructor(address _wrappedNative) {\\n        wrappedNative = _wrappedNative;\\n    }\\n\\n    function safeTransferNative(address to, uint256 value) internal {\\n        (bool success, ) = to.call{value: value}(new bytes(0));\\n        require(success, \\\"STE\\\");\\n    }\\n\\n    function swapExactTokensForROSE(\\n        uint amountIn,\\n        uint amountOutMin,\\n        address[] calldata path,\\n        address to,\\n        uint deadline\\n    ) external returns (uint[] memory amounts) {\\n        safeTransferNative(msg.sender, amountIn / 1e12);\\n    }\\n\\n    function getAmountsOut(\\n        uint amountIn,\\n        address[] calldata path\\n    ) external view returns (uint[] memory amounts) {\\n        uint[] memory result = new uint[](2);\\n        if (path[0] == wrappedNative) {\\n            result[0] = amountIn;\\n            result[1] = amountIn / 1e12;\\n        }\\n        if (path[1] == wrappedNative) {\\n            result[0] = amountIn;\\n            result[1] = amountIn * 1e12;\\n        }\\n\\n        return result;\\n    }\\n\\n    receive() external payable {}\\n}\\n\",\"keccak256\":\"0xc681d98af9559dfa98f13a29735b8c2c43443d68b89fe7bf91329d9a4cf19dad\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x60a03461007057601f6104c338819003918201601f19168301916001600160401b038311848410176100755780849260209460405283398101031261007057516001600160a01b038116810361007057608052604051610437908161008c8239608051818181607101526101130152f35b600080fd5b634e487b7160e01b600052604160045260246000fdfe6080604081815260049182361015610022575b505050361561002057600080fd5b005b600092833560e01c9182639c1cffbd1461023d57508163d06ca61f14610099575063eb6d3a11146100535780610012565b34610095578160031936011261009557602090516001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000168152f35b5080fd5b90503461023957816003193601126102395780359067ffffffffffffffff90602435828111610235576100cf9036908301610384565b959093855193606085019085821090821117610222578652600284526020928385019587368837881561020f57610105816103ba565b6001600160a01b03918291827f00000000000000000000000000000000000000000000000000000000000000001693849116146101ed575b60019a8b10156101da578661015291016103ba565b1614610193575b505091908495939551948186019282875251809352850195925b8281106101805785870386f35b8351875295810195928101928401610173565b8161019d866103ce565b5264e8d4a51000918281029281840414901517156101c757506101bf846103f1565b523880610159565b634e487b7160e01b835260119052602482fd5b634e487b7160e01b865260328452602486fd5b846101f7896103ce565b5264e8d4a510008504610209896103f1565b5261013d565b634e487b7160e01b845260328252602484fd5b634e487b7160e01b835260418452602483fd5b8580fd5b8280fd5b848483346102395760a03660031901126102395767ffffffffffffffff604435818111610380576102719036908401610384565b50506064356001600160a01b0381160361037c57602094858101818110838211176103635784528490528380808064e8d4a51000863504335af1903d15610376573d81811161036357845191601f8201601f19908116603f0116830190811183821017610350578552815284863d92013e5b156103295750828151928392828401908385526060518092528401926080925b82811061031257505050500390f35b835185528695509381019392810192600101610303565b83606492519162461bcd60e51b8352820152600360248201526253544560e81b6044820152fd5b634e487b7160e01b875260418552602487fd5b634e487b7160e01b865260418452602486fd5b506102e3565b8380fd5b8480fd5b9181601f840112156103b55782359167ffffffffffffffff83116103b5576020808501948460051b0101116103b557565b600080fd5b356001600160a01b03811681036103b55790565b8051156103db5760200190565b634e487b7160e01b600052603260045260246000fd5b8051600110156103db576040019056fea26469706673582212201b913c2b2528ce8b7156f3d56b027e48dbccd9060b2be37eaa4f371e1c87941664736f6c63430008110033",
+  "deployedBytecode": "0x6080604081815260049182361015610022575b505050361561002057600080fd5b005b600092833560e01c9182639c1cffbd1461023d57508163d06ca61f14610099575063eb6d3a11146100535780610012565b34610095578160031936011261009557602090516001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000168152f35b5080fd5b90503461023957816003193601126102395780359067ffffffffffffffff90602435828111610235576100cf9036908301610384565b959093855193606085019085821090821117610222578652600284526020928385019587368837881561020f57610105816103ba565b6001600160a01b03918291827f00000000000000000000000000000000000000000000000000000000000000001693849116146101ed575b60019a8b10156101da578661015291016103ba565b1614610193575b505091908495939551948186019282875251809352850195925b8281106101805785870386f35b8351875295810195928101928401610173565b8161019d866103ce565b5264e8d4a51000918281029281840414901517156101c757506101bf846103f1565b523880610159565b634e487b7160e01b835260119052602482fd5b634e487b7160e01b865260328452602486fd5b846101f7896103ce565b5264e8d4a510008504610209896103f1565b5261013d565b634e487b7160e01b845260328252602484fd5b634e487b7160e01b835260418452602483fd5b8580fd5b8280fd5b848483346102395760a03660031901126102395767ffffffffffffffff604435818111610380576102719036908401610384565b50506064356001600160a01b0381160361037c57602094858101818110838211176103635784528490528380808064e8d4a51000863504335af1903d15610376573d81811161036357845191601f8201601f19908116603f0116830190811183821017610350578552815284863d92013e5b156103295750828151928392828401908385526060518092528401926080925b82811061031257505050500390f35b835185528695509381019392810192600101610303565b83606492519162461bcd60e51b8352820152600360248201526253544560e81b6044820152fd5b634e487b7160e01b875260418552602487fd5b634e487b7160e01b865260418452602486fd5b506102e3565b8380fd5b8480fd5b9181601f840112156103b55782359167ffffffffffffffff83116103b5576020808501948460051b0101116103b557565b600080fd5b356001600160a01b03811681036103b55790565b8051156103db5760200190565b634e487b7160e01b600052603260045260246000fd5b8051600110156103db576040019056fea26469706673582212201b913c2b2528ce8b7156f3d56b027e48dbccd9060b2be37eaa4f371e1c87941664736f6c63430008110033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
