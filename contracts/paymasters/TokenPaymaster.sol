@@ -8,14 +8,17 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "./utils/LuminexSwapHelper.sol";
 
-/// This Paymaster covers gas fees in exchange for ERC20 tokens charged using allowance pre-issued by ERC-4337 accounts.
-/// The contract refunds excess tokens if the actual gas cost is lower than the initially provided amount.
-/// The token price cannot be queried in the validation code due to storage access restrictions of ERC-4337.
-/// It is theoretically possible the token has depreciated so much since the last 'postOp' the refund becomes negative.
-/// The contract reverts the inner user transaction in that case but keeps the charge.
-/// The contract also allows honest clients to prepay tokens at a higher price to avoid getting reverted.
-/// It also allows updating price configuration and withdrawing tokens by the contract owner.
-/// @dev Inherits from BasePaymaster.
+/**
+ * @title TokenPaymaster
+ * @notice This Paymaster covers gas fees in exchange for ERC20 tokens charged using allowance pre-issued by ERC-4337 accounts.
+ * The contract refunds excess tokens if the actual gas cost is lower than the initially provided amount.
+ * The token price cannot be queried in the validation code due to storage access restrictions of ERC-4337.
+ * It is theoretically possible the token has depreciated so much since the last 'postOp' the refund becomes negative.
+ * The contract reverts the inner user transaction in that case but keeps the charge.
+ * The contract also allows honest clients to prepay tokens at a higher price to avoid getting reverted.
+ * It also allows updating price configuration and withdrawing tokens by the contract owner.
+ * @dev Inherits from BasePaymaster.
+ */
 contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     struct TokenPaymasterConfig {
         /// @notice Estimated gas cost for refunding tokens after the transaction is completed
@@ -44,6 +47,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     /// @notice Initializes the TokenPaymaster contract with the given parameters.
     /// @param _entryPoint The EntryPoint contract used in the Account Abstraction infrastructure.
     /// @param _wrappedNative The ERC-20 token that wraps the native asset for current chain.
+    /// @param _luminexRouterV1 The LuminexRouterV1 contract used for token swaps.
     /// @param _tokenPaymasterConfig The configuration for the Token Paymaster.
     /// @param _owner The address that will be set as the owner of the contract.
     constructor(
@@ -60,6 +64,8 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         transferOwnership(_owner);
     }
 
+    /// @notice Adds support for an ERC20 token to be used for charging gas fees.
+    /// @param token The address of the ERC20 token to be supported.
     function addERC20Support(address token) public onlyOwner {
         countTokenSupport++;
         tokenSupport[token] = true;
@@ -76,6 +82,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     /// @notice Allows the contract owner to withdraw a specified amount of tokens from the contract.
+    /// @param token The ERC20 token to withdraw.
     /// @param to The address to transfer the tokens to.
     /// @param amount The amount of tokens to transfer.
     function withdrawToken(
@@ -98,10 +105,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     )
         internal
         override
-        returns (
-            bytes memory context,
-            uint256 validationResult
-        )
+        returns (bytes memory context, uint256 validationResult)
     {
         unchecked {
             uint256 maxFeePerGas = userOp.maxFeePerGas;
@@ -209,6 +213,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     /// @notice If necessary this function uses this Paymaster's token balance to refill the deposit on EntryPoint
+    /// @param token The ERC20 token address to be used for refilling the deposit
     function refillEntryPointDeposit(address token) private {
         // if the ERC20 token is wrapped native token and paymaster's balance of that token is greater than minSwapAmount, unwrap and deposit to entry point
         if (address(token) == address(wrappedNative)) {
@@ -240,6 +245,8 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     /// @notice For contract owner to withdraw ETH from the contract
+    /// @param recipient The address to transfer the ETH to
+    /// @param amount The amount of ETH to transfer
     function withdrawEth(
         address payable recipient,
         uint256 amount
