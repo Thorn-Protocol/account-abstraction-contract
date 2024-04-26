@@ -3,15 +3,25 @@ pragma solidity ^0.8.17;
 import "../interfaces/ILuminexRouterV1.sol";
 import "../interfaces/IWrappedNative.sol";
 
+/**
+ * @title LuminexSwapHelper
+ * @notice Helper contract to interact with LuminexRouterV1 for swapping native token to ERC20 token and vice versa
+ */
 abstract contract LuminexSwapHelper {
     address public immutable luminexRouterV1;
     address public immutable wrappedNative;
 
+    /// @param _luminexRouterV1 LuminexRouterV1 contract address
+    /// @param _wrappnative Wrapped native token contract address
     constructor(address _luminexRouterV1, address _wrappnative) {
         luminexRouterV1 = _luminexRouterV1;
         wrappedNative = _wrappnative;
     }
 
+    /// @notice estimate ERC20 token receive in exchange with amountIn of native token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of native token
+    /// @return amountOut amount of ERC20 token receive in exchange with amountIn of native token
     function estimateNativeToToken(
         address token,
         uint256 amountIn
@@ -24,6 +34,10 @@ abstract contract LuminexSwapHelper {
         amountOut = result[1];
     }
 
+    /// @notice estimate native token receive in exchange with amountIn of ERC20 token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of ERC20 token
+    /// @return amountOut amount of native token receive in exchange with amountIn of ERC20 token
     function estimateTokenToNative(
         address token,
         uint256 amountIn
@@ -36,6 +50,9 @@ abstract contract LuminexSwapHelper {
         amountOut = result[1];
     }
 
+    /// @notice swap native token to ERC20 token by calling LuminexRouterV1
+    /// @param token ERC20 token address
+    /// @param amountIn amount of native token
     function _swapTokenToNative(address token, uint256 amountIn) internal {
         address[] memory path = new address[](2);
         path[0] = token;
@@ -49,6 +66,8 @@ abstract contract LuminexSwapHelper {
         );
     }
 
+    /// @notice unwrap WETH by withdrawing
+    /// @param amount amount of WETH to withdraw
     function unwrapWeth(uint256 amount) internal {
         IWETH(address(wrappedNative)).withdraw(amount);
     }
