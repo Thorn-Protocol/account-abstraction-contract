@@ -33,6 +33,11 @@ export const getTokenPaymaster = async () => {
 export const getMockWrappedNative = async () => {
     const MockWrappedNativeDeployment = await deployments.get("MockWrappedNative");
     const MockWrappedNative = await hre.ethers.getContractFactory("MockWrappedNative");
+    console.log("  chain =  ", (await hre.ethers.provider.getNetwork()).chainId);
+    const chaindId = (await hre.ethers.provider.getNetwork()).chainId;
+    if (chaindId == 23295) {
+        return MockWrappedNative.attach("0xB759a0fbc1dA517aF257D5Cf039aB4D86dFB3b94");
+    }
     return MockWrappedNative.attach(MockWrappedNativeDeployment.address);
 };
 

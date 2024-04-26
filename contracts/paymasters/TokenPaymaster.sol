@@ -8,14 +8,16 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "./utils/LuminexSwapHelper.sol";
 
-/// This Paymaster covers gas fees in exchange for ERC20 tokens charged using allowance pre-issued by ERC-4337 accounts.
-/// The contract refunds excess tokens if the actual gas cost is lower than the initially provided amount.
-/// The token price cannot be queried in the validation code due to storage access restrictions of ERC-4337.
-/// It is theoretically possible the token has depreciated so much since the last 'postOp' the refund becomes negative.
-/// The contract reverts the inner user transaction in that case but keeps the charge.
-/// The contract also allows honest clients to prepay tokens at a higher price to avoid getting reverted.
-/// It also allows updating price configuration and withdrawing tokens by the contract owner.
-/// @dev Inherits from BasePaymaster.
+/* 
+This Paymaster covers gas fees in exchange for ERC20 tokens charged using allowance pre-issued by ERC-4337 accounts.
+ The contract refunds excess tokens if the actual gas cost is lower than the initially provided amount.
+ The token price cannot be queried in the validation code due to storage access restrictions of ERC-4337.
+ It is theoretically possible the token has depreciated so much since the last 'postOp' the refund becomes negative.
+ The contract reverts the inner user transaction in that case but keeps the charge.
+ The contract also allows honest clients to prepay tokens at a higher price to avoid getting reverted.
+ It also allows updating price configuration and withdrawing tokens by the contract owner.
+ @dev Inherits from BasePaymaster.
+ */
 contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     struct TokenPaymasterConfig {
         /// @notice Estimated gas cost for refunding tokens after the transaction is completed
@@ -25,7 +27,12 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     mapping(address => bool) public tokenSupport;
+    mapping(address => uint256) public tokenToOrdinal;
+    mapping(uint256 => address) public ordinalToToken;
+
     uint256 public countTokenSupport;
+    uint256 public totalToken;
+
     address[] public listTokenSupport;
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
@@ -60,9 +67,42 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     function addERC20Support(address token) public onlyOwner {
-        countTokenSupport++;
-        tokenSupport[token] = true;
-        listTokenSupport.push(token);
+        if (tokenSupport[token]) revert("token was enabled");
+
+        if (tokenToOrdinal[token] == 0) {
+            // add new token
+            totalToken++;
+            countTokenSupport++;
+            tokenToOrdinal[token] = totalToken;
+            ordinalToToken[totalToken] = token;
+            tokenSupport[token] = true;
+        } else {
+            // change state
+            countTokenSupport++;
+            tokenSupport[token] = true;
+        }
+    }
+
+    function removeERC20Support(address token) public onlyOwner {
+        require(tokenSupport[token], "Token was removed");
+        countTokenSupport--;
+        tokenSupport[token] = false;
+    }
+
+    function getListTokenSupport()
+        public
+        view
+        returns (address[] memory result)
+    {
+        result = new address[](countTokenSupport);
+        uint256 j = 0;
+        for (uint256 i = 1; i <= totalToken; i++) {
+            if (tokenSupport[ordinalToToken[i]] == true) {
+                result[j] = ordinalToToken[i];
+                j++;
+            }
+        }
+        return result;
     }
 
     /// @notice Updates the configuration for the Token Paymaster.

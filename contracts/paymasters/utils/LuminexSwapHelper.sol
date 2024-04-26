@@ -4,19 +4,6 @@ import "../interfaces/ILuminexRouterV1.sol";
 import "../interfaces/IWrappedNative.sol";
 
 abstract contract LuminexSwapHelper {
-    event UniswapReverted(
-        address tokenIn,
-        address tokenOut,
-        uint256 amountIn,
-        uint256 amountOutMin
-    );
-
-    struct UniswapHelperConfig {
-        /// @notice Minimum native asset amount to receive from a single swap
-        uint256 minSwapAmount;
-        uint8 slippage;
-    }
-
     address public immutable luminexRouterV1;
     address public immutable wrappedNative;
 
