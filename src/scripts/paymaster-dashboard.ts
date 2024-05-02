@@ -2,6 +2,20 @@ import * as hre from "hardhat";
 import { getEntryPoint, getTokenPaymaster } from "../utils/setupHelper";
 import { disableToken, enableToken } from "./paymaster-config-token";
 import { formatEther, parseEther } from "ethers/lib/utils";
+import { TokenPaymaster } from "../../typechain-types";
+
+async function updateConfig() {
+    const tokenPaymasterConfig: TokenPaymaster.TokenPaymasterConfigStruct = {
+        refundPostopCost: 40000,
+        minSwapAmount: parseEther("5"),
+    };
+    const paymaster = await getTokenPaymaster();
+
+    const tx = await (await paymaster.setTokenPaymasterConfig(tokenPaymasterConfig)).wait();
+
+    const data = await paymaster.tokenPaymasterConfig();
+    console.log(" data = ", data);
+}
 
 async function paymasterDashboard() {
     const { deployments, getNamedAccounts } = hre;
@@ -21,21 +35,7 @@ async function paymasterDashboard() {
     }
     balanceOfPaymaster = formatEther(await entryPoint.balanceOf(paymaster.address));
     console.log(" balance Paymaster in Entrypoint", balanceOfPaymaster);
-    // const countToken = Number(await paymaster.countTokenSupport());
-    // for (let i = 0; i < countToken; i++) {
-    //     const token = await paymaster.listTokenSupport(i);
-    //     console.log(" token ", i, ": ", token);
-    // }
-    const USDC = "0xB649cF2Fca36CaB5dCd4aFC51cC901a4b3cff4a8";
-    const USDT = "0x9DA08dDBCB74e9BDf309C7fa94F3b7AFB3341EB2";
-    const ETH = "0xCb4D186B2bE6e3e1fa067Ceb86EC30D6278A3a90";
-    // await enableToken(USDC);
-    // await enableToken(USDC);
-    // await enableToken(USDT);
-    // await enableToken(ETH);
-    // await disableToken("0x1DD8219c8A8f2fF453fd19F775e3dA8c0501E768");
-    // await disableToken("0x9DA08dDBCB74e9BDf309C7fa94F3b7AFB3341EB2");
-    // await disableToken("0xCb4D186B2bE6e3e1fa067Ceb86EC30D6278A3a90");
-    // await enableToken(USDC);
+
+    // await updateConfig();
 }
 paymasterDashboard();
