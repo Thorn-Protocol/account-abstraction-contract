@@ -48,46 +48,42 @@ const config: HardhatUserConfig = {
             },
         ],
     },
+    // defaultNetwork: "sapphire-testnet",
     defaultNetwork: "sapphire-testnet",
     networks: {
         hardhat: {
             chainId: 31337,
             accounts: TEST_HDWALLET,
             tags: ["hardhat"],
+            initialBaseFeePerGas: 100e9,
         },
-        sapphire: {
+        "sapphire-mainnet": {
             url: "https://sapphire.oasis.io",
             chainId: 0x5afe,
             accounts,
+            live: true,
+            tags: ["sapphire-mainnet"],
         },
         "sapphire-testnet": {
             url: "https://testnet.sapphire.oasis.dev",
             chainId: 0x5aff,
             accounts,
             live: true,
-            tags: ["testnet"],
+            tags: ["sapphire-testnet"],
         },
         "sapphire-localnet": {
             url: "http://localhost:8545",
-            tags: ["testnet"],
+
             accounts: TEST_HDWALLET,
             chainId: 0x5afd,
-            // gasPrice: 1,
-            blockGasLimit: 1e9,
+            tags: ["sapphire-localnet"],
         },
-        "bsc_testnet": {
-            url: "https://data-seed-prebsc-1-s1.bnbchain.org:8545",
-            chainId: 97,
-            gasPrice: 20000000000,
-            // accounts: { mnemonic: process.env.MNEMONIC }
-        },
-
-        folked_oasis: {
-            tags: ["forked-oasis"],
-            url: "http://127.0.0.1:9000",
+        "bsc-testnet": {
+            url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
             accounts,
-            live: false,
-            chainId: 31337,
+            live: true,
+            chainId: 97,
+            tags: ["bsc-testnet"],
         },
     },
 };

@@ -1,11 +1,13 @@
 {
     "scripts": {
         "folk-oasis": "hardhat node --fork https://nd-587-152-604.p2pify.com/74b690052b3dd4f1ee8360ed4934ba94 --fork-block-number 3000000 --hostname 0.0.0.0 --port 9000 --tags folked-oasis",
-        "gen-typechain": "typechain --target ethers-v5 --out-dir contract-types './abis/*.json'"
+        "gen-typechain": "typechain --target ethers-v5 --out-dir contract-types './abis/*.json'",
+        "gen-typechain-v6": "typechain --target ethers-v6  "
     },
     "dependencies": {
         "@nomicfoundation/ethereumjs-vm": "^7.0.4",
         "@nomiclabs/hardhat-ethers": "^2.2.3",
+        "@oasisprotocol/sapphire-contracts": "^0.2.8",
         "@uniswap/v3-periphery": "^1.4.4",
         "hardhat": "^2.19.2",
         "hardhat-dependency-compiler": "^1.1.3",

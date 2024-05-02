@@ -10,7 +10,7 @@ import "@uniswap/v3-periphery/contracts/interfaces/IPeripheryPayments.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
-import "contracts/smart-account/interfaces/IWETH.sol";
+import "contracts/interfaces/IWETH.sol";
 
 abstract contract UniswapHelper {
     event UniswapReverted(
