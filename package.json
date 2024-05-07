@@ -1,34 +1,34 @@
 {
-    "scripts": {
-        "folk-oasis": "hardhat node --fork https://nd-587-152-604.p2pify.com/74b690052b3dd4f1ee8360ed4934ba94 --fork-block-number 3000000 --hostname 0.0.0.0 --port 9000 --tags folked-oasis",
-        "gen-typechain": "typechain --target ethers-v5 --out-dir contract-types './abis/*.json'",
-        "gen-typechain-v6": "typechain --target ethers-v6  "
-    },
-    "dependencies": {
-        "@nomicfoundation/ethereumjs-vm": "^7.0.4",
-        "@nomiclabs/hardhat-ethers": "^2.2.3",
-        "@oasisprotocol/sapphire-contracts": "^0.2.8",
-        "@uniswap/v3-periphery": "^1.4.4",
-        "hardhat": "^2.19.2",
-        "hardhat-dependency-compiler": "^1.1.3",
-        "hardhat-deploy": "^0.12.2",
-        "hardhat-tracer": "^2.8.1",
-        "solidity-bytes-utils": "^0.8.0"
-    },
-    "devDependencies": {
-        "@account-abstraction/contracts": "^0.6.0",
-        "@oasisprotocol/sapphire-hardhat": "^2.19.4",
-        "@openzeppelin/contracts": "^4.9.3",
-        "@typechain/ethers-v5": "^11.1.2",
-        "@typechain/hardhat": "^7.0.0",
-        "@types/mocha": "^10.0.4",
-        "chai": "^4.3.10",
-        "dotenv": "^16.0.1",
-        "ethereumjs-util": "^7.1.5",
-        "ethers": "^5.7.2",
-        "hardhat-deploy-ethers": "^0.3.0-beta.13",
-        "hardhat-gas-reporter": "^1.0.9",
-        "merkletreejs": "^0.3.11",
-        "ts-node": "^10.9.2"
-    }
+  "scripts": {
+    "folk-oasis": "hardhat node --fork https://nd-587-152-604.p2pify.com/74b690052b3dd4f1ee8360ed4934ba94 --fork-block-number 3000000 --hostname 0.0.0.0 --port 9000 --tags folked-oasis",
+    "gen-typechain": "typechain --target ethers-v5 --out-dir contract-types './abis/*.json'",
+    "gen-typechain-v6": "typechain --target ethers-v6  "
+  },
+  "dependencies": {
+    "@nomicfoundation/ethereumjs-vm": "^7.0.4",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@oasisprotocol/sapphire-contracts": "^0.2.8",
+    "@uniswap/v3-periphery": "^1.4.4",
+    "hardhat": "^2.19.2",
+    "hardhat-dependency-compiler": "^1.1.3",
+    "hardhat-deploy": "^0.12.2",
+    "hardhat-tracer": "^2.8.1",
+    "solidity-bytes-utils": "^0.8.0"
+  },
+  "devDependencies": {
+    "@account-abstraction/contracts": "^0.6.0",
+    "@oasisprotocol/sapphire-hardhat": "^2.19.4",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@typechain/ethers-v5": "^11.1.2",
+    "@typechain/hardhat": "^7.0.0",
+    "@types/mocha": "^10.0.4",
+    "chai": "^4.3.10",
+    "dotenv": "^16.0.1",
+    "ethereumjs-util": "^7.1.5",
+    "ethers": "^5.7.2",
+    "hardhat-deploy-ethers": "^0.3.0-beta.13",
+    "hardhat-gas-reporter": "^1.0.9",
+    "merkletreejs": "^0.3.11",
+    "ts-node": "^10.9.2"
+  }
 }
