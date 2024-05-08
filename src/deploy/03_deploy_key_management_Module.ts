@@ -6,14 +6,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  //   await deploy("KeyManagement", {
-  //     from: deployer,
-  //     args: [],
-  //     log: true,
-  //     // deterministicDeployment: true,
-  //     skipIfAlreadyDeployed: true,
-  //     autoMine: true,
-  //   });
+  await deploy("KeyManagement", {
+    from: deployer,
+    args: [],
+    log: true,
+    deterministicDeployment: true,
+    //skipIfAlreadyDeployed: true,
+    autoMine: true,
+  });
 };
 deploy.tags = ["hardhat", "sapphire-localnet", "sapphire-testnet", "bsc-testnet"];
 export default deploy;

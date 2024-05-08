@@ -33,7 +33,6 @@ export const getTokenPaymaster = async () => {
 export const getMockWrappedNative = async () => {
   const MockWrappedNativeDeployment = await deployments.get("MockWrappedNative");
   const MockWrappedNative = await hre.ethers.getContractFactory("MockWrappedNative");
-  console.log("  chain =  ", (await hre.ethers.provider.getNetwork()).chainId);
   const chaindId = (await hre.ethers.provider.getNetwork()).chainId;
   if (chaindId == 23295) {
     return MockWrappedNative.attach("0xB759a0fbc1dA517aF257D5Cf039aB4D86dFB3b94");
@@ -50,6 +49,12 @@ export const getEcdsaOwnershipRegistryModule = async () => {
   const EcdsaOwnershipRegistryModuleDeployment = await deployments.get("EcdsaOwnershipRegistryModule");
   const EcdsaOwnershipRegistryModule = await hre.ethers.getContractFactory("EcdsaOwnershipRegistryModule");
   return EcdsaOwnershipRegistryModule.attach(EcdsaOwnershipRegistryModuleDeployment.address);
+};
+
+export const getKeyManagementModule = async () => {
+  const KeyManagementModuleDeployment = await deployments.get("KeyManagement");
+  const KeyManagementModule = await hre.ethers.getContractFactory("KeyManagement");
+  return KeyManagementModule.attach(KeyManagementModuleDeployment.address);
 };
 
 // export const getSmartAccountFactory = async () => {
