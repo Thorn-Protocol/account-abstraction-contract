@@ -1,8 +1,9 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { deployments, ethers } from "hardhat";
-import { getEcdsaOwnershipRegistryModule, getEntryPoint, getKeyManagementModule, getSmartAccountFactory, getSmartAccountWithModule } from "../../src/utils/setupHelper";
-import { makeEcdsaModuleUserOp } from "../../src/utils/userOp";
+import { getEcdsaOwnershipRegistryModule, getEntryPoint, getKeyManagementModule, getPasswordKMMModule, getSmartAccountFactory, getSmartAccountWithModule } from "../../src/utils/setupHelper";
+import { makeEcdsaModuleUserOp, makePasswordUserOp } from "../../src/utils/userOp";
 import { parseEther } from "ethers/lib/utils";
+import { keccak256 } from "ethereumjs-util";
 
 describe("KeyManagement", function () {
   let deployer: SignerWithAddress;
@@ -30,11 +31,33 @@ describe("KeyManagement", function () {
 
     return {
       entryPoint: entryPoint,
+      keyManagementModule,
       callData,
       userSA,
+      ecdsaModule,
     };
   };
   it(" test 1 ", async () => {
-    await setupTests();
+    const { entryPoint, callData, userSA, keyManagementModule, ecdsaModule } = await setupTests();
+
+    const password = "123456";
+
+    const PasswordKMM = await getPasswordKMMModule();
+
+    const tx0 = await PasswordKMM.populateTransaction.setPassword(password);
+    console.log(" tx0 = ", tx0);
+    const tx1 = await makeEcdsaModuleUserOp("execute", [tx0.to, 0, tx0.data], userSA.address, deployer, entryPoint, ecdsaModule.address);
+    console.log("password before = ", await PasswordKMM.getPassword(userSA.address));
+    const receipt = await (await entryPoint.connect(deployer).handleOps([tx1], deployer.address)).wait();
+    console.log(" password after ", await PasswordKMM.getPassword(userSA.address));
+
+    //enable password module to key management module
+    const tx2 = await keyManagementModule.populateTransaction.enableModule(PasswordKMM.address);
+    const tx3 = await makeEcdsaModuleUserOp("execute", [tx2.to, 0, tx2.data], userSA.address, deployer, entryPoint, ecdsaModule.address);
+    await (await entryPoint.connect(deployer).handleOps([tx3], deployer.address)).wait();
+
+    console.log(" module status after = ", await keyManagementModule.isModuleEnabled(userSA.address, PasswordKMM.address));
+
+    const tx4 = await makePasswordUserOp("execute", [deployer.address, 0, "0x"], userSA.address, deployer, entryPoint, ecdsaModule.address);
   });
 });

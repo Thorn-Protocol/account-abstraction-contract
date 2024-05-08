@@ -57,6 +57,12 @@ export const getKeyManagementModule = async () => {
   return KeyManagementModule.attach(KeyManagementModuleDeployment.address);
 };
 
+export const getPasswordKMMModule = async () => {
+  const PasswordKMMDeployment = await deployments.get("PasswordKMM");
+  const PasswordKMM = await hre.ethers.getContractFactory("PasswordKMM");
+  return PasswordKMM.attach(PasswordKMMDeployment.address);
+};
+
 // export const getSmartAccountFactory = async () => {
 //   const SAFactoryDeployment = await deployments.get("SmartAccountFactory");
 //   console.log("hre = ", await ethers.provider.getBlockNumber());

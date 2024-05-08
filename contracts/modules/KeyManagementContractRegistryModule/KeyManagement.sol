@@ -29,28 +29,46 @@ contract KeyManagement is BaseAuthorizationModule {
         return address(this);
     }
 
-    function _setupModule(
-        address setupContract,
-        bytes memory setupData
-    ) internal returns (address module) {
-        if (setupContract == address(0)) revert("Wrong Module Setup Address");
-        assembly {
-            let success := call(
-                gas(),
-                setupContract,
-                0,
-                add(setupData, 0x20),
-                mload(setupData),
-                0,
-                0
-            )
-            let ptr := mload(0x40)
-            returndatacopy(ptr, 0, returndatasize())
-            if iszero(success) {
-                revert(ptr, returndatasize())
-            }
-            module := mload(ptr)
-        }
+    // function _setupModule(
+    //     address setupContract,
+    //     bytes memory setupData
+    // ) internal returns (address module) {
+    //     if (setupContract == address(0)) revert("Wrong Module Setup Address");
+    //     assembly {
+    //         let success := call(
+    //             gas(),
+    //             setupContract,
+    //             0,
+    //             add(setupData, 0x20),
+    //             mload(setupData),
+    //             0,
+    //             0
+    //         )
+    //         let ptr := mload(0x40)
+    //         returndatacopy(ptr, 0, returndatasize())
+    //         if iszero(success) {
+    //             revert(ptr, returndatasize())
+    //         }
+    //         module := mload(ptr)
+    //     }
+    // }
+
+    // function setupAndEnableModule(
+    //     address setupContract,
+    //     bytes memory setupData
+    // ) external returns (address) {
+    //     address module = _setupModule(setupContract, setupData);
+    // }
+
+    function enableModule(address moduleAddress) external {
+        _modules[msg.sender][moduleAddress] = address(1);
+    }
+
+    function isModuleEnabled(
+        address account,
+        address moduleAddress
+    ) public view returns (bool) {
+        return _modules[account][moduleAddress] != address(0);
     }
 
     modifier onlyOwner(bytes calldata data, address smartAccount) {

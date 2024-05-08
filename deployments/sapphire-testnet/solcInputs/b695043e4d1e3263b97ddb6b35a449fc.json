@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/modules/KeyManagementContractRegistryModule/modules/PasswordKMM.sol": {
+      "content": "// SPDX-License-Identifier: MIT\r\npragma solidity 0.8.17;\r\n\r\ncontract PasswordKMM {\r\n    string public constant NAME = \"Password Module For Key Management\";\r\n\r\n    mapping(address => bytes32) private _passwordTable;\r\n\r\n    error AlreadyInited(address smartAccount);\r\n    error ZeroAddressNotAllowedAsOwner();\r\n    error NoOwnerRegisteredForSmartAccount(address smartAccount);\r\n    error WrongSignatureLength();\r\n\r\n    function initForSmartAccount(\r\n        string memory password\r\n    ) external returns (address) {\r\n        if (_passwordTable[msg.sender] == bytes32(0))\r\n            revert AlreadyInited(msg.sender);\r\n        _passwordTable[msg.sender] = keccak256(bytes(password));\r\n        return address(this);\r\n    }\r\n\r\n    function setPassword(string memory password) external {\r\n        if (_passwordTable[msg.sender] == bytes32(0))\r\n            revert AlreadyInited(msg.sender);\r\n        _passwordTable[msg.sender] = keccak256(bytes(password));\r\n    }\r\n\r\n    function validate(\r\n        bytes calldata data\r\n    ) external view virtual returns (bool) {\r\n        string memory password = abi.decode(data, (string));\r\n\r\n        if (_verifySignature(keccak256(bytes(password)), msg.sender)) {\r\n            return true;\r\n        }\r\n        return false;\r\n    }\r\n\r\n    function _verifySignature(\r\n        bytes32 hashedPassword,\r\n        address smartAccount\r\n    ) internal view returns (bool) {\r\n        bytes32 expectedPasswordHash = _passwordTable[smartAccount];\r\n\r\n        return (expectedPasswordHash == hashedPassword);\r\n    }\r\n\r\n    /**\r\n     * @dev Checks if the address provided is a smart contract.\r\n     * @param account Address to be checked.\r\n     */\r\n    function _isSmartContract(address account) internal view returns (bool) {\r\n        uint256 size;\r\n        assembly {\r\n            size := extcodesize(account)\r\n        }\r\n        return size > 0;\r\n    }\r\n}\r\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 800
+    },
+    "viaIR": true,
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

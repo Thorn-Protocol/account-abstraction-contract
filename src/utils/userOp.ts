@@ -1,13 +1,14 @@
-import { arrayify, BytesLike, defaultAbiCoder, hexConcat, hexDataSlice, hexlify, hexValue, hexZeroPad, keccak256 } from "ethers/lib/utils";
+import { AbiCoder, arrayify, BytesLike, defaultAbiCoder, hexConcat, hexDataSlice, hexlify, hexValue, hexZeroPad, keccak256 } from "ethers/lib/utils";
 import { UserOperation } from "./userOperation";
 import { AddressZero, callDataCost, rethrow } from "./testUtils";
-import { BigNumber, BigNumberish, Contract, Signer, Wallet } from "ethers";
+import { BigNumber, BigNumberish, Contract, Signer, utils, Wallet } from "ethers";
 import { EntryPoint } from "@account-abstraction/contracts";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ecsign, toRpcSig, keccak256 as keccak256Buffer } from "ethereumjs-util";
 import { Create2Factory } from "../Create2Factory";
 import { ethers } from "hardhat";
 import { MerkleTree } from "merkletreejs";
+import { getKeyManagementModule, getPasswordKMMModule } from "./setupHelper";
 export function packUserOp(op: UserOperation, forSignature = true): string {
   if (forSignature) {
     return defaultAbiCoder.encode(
@@ -192,7 +193,7 @@ export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryP
     if (provider == null) throw new Error("must have entryPoint to autofill maxFeePerGas");
     const block = await provider.getBlock("latest");
     // console.log("block = ", block);
-    op1.maxFeePerGas = 100e9;
+    op1.maxFeePerGas = 1e9;
     //op1.maxFeePerGas = block.baseFeePerGas!.add(op1.maxPriorityFeePerGas ?? DefaultsForUserOp.maxPriorityFeePerGas);
   }
   // TODO: this is exactly what fillUserOp below should do - but it doesn't.
@@ -224,7 +225,6 @@ export async function fillAndSign(
 
   const chainId = await provider!.getNetwork().then((net) => net.chainId);
   const message = arrayify(getUserOpHash(op2, entryPoint!.address, chainId));
-
   return {
     ...op2,
     signature: await signer.signMessage(message),
@@ -267,6 +267,49 @@ export async function makeEcdsaModuleUserOp(
   userOp.signature = signatureWithModuleAddress;
   //  console.log("userOP = ", userOp);
   return userOp;
+}
+
+export async function makePasswordUserOp(
+  functionName: string,
+  functionParams: any,
+  userOpSender: string,
+  userOpSigner: Signer,
+  entryPoint: EntryPoint,
+  moduleAddress: string,
+  options?: {
+    preVerificationGas?: number;
+  },
+  nonceKey = 0
+) {
+  const SmartAccount = await ethers.getContractFactory("SmartAccount");
+  const txnDataAA1 = SmartAccount.interface.encodeFunctionData(functionName, functionParams);
+  const userOp = await fillAndSign(
+    {
+      sender: userOpSender,
+      callData: txnDataAA1,
+      ...options,
+    },
+    userOpSigner,
+    entryPoint,
+    "nonce",
+    true,
+    nonceKey,
+    0
+  );
+  const provider = entryPoint?.provider;
+  const chainId = await provider!.getNetwork().then((net) => net.chainId);
+  const message = arrayify(getUserOpHash(userOp, entryPoint!.address, chainId));
+
+  const keyManagementModule = await getKeyManagementModule();
+  const passwordKMMModule = await getPasswordKMMModule();
+  // //
+  const authenticationData = ethers.utils.defaultAbiCoder.encode(["string", "address"], ["123456", passwordKMMModule.address]);
+  //
+  console.log(" a = ", ethers.utils.keccak256(utils.formatBytes32String("123456")));
+  console.log(" format ", ethers.utils.parseBytes32String(ethers.utils.formatBytes32String("123456")));
+
+  console.log(" authenticationData = ", authenticationData);
+  // const messageSigned = await keyManagementModule.sign(, userOpSender, message);
 }
 
 export async function makeEcdsaModuleUserOpWithPaymaster(

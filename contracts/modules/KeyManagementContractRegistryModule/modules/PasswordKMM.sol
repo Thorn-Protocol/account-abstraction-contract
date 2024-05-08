@@ -20,12 +20,25 @@ contract PasswordKMM {
         return address(this);
     }
 
+    function setPassword(string memory password) external {
+        // if (_passwordTable[msg.sender] == bytes32(0))
+        //     revert AlreadyInited(msg.sender);
+        _passwordTable[msg.sender] = keccak256(bytes(password));
+    }
+
+    function getPassword(
+        address account
+    ) external view returns (bytes32 password) {
+        return _passwordTable[account];
+    }
+
     function validate(
-        bytes calldata data
+        bytes calldata data,
+        address account
     ) external view virtual returns (bool) {
         string memory password = abi.decode(data, (string));
 
-        if (_verifySignature(keccak256(bytes(password)), msg.sender)) {
+        if (_verifySignature(keccak256(bytes(password)), account)) {
             return true;
         }
         return false;
