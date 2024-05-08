@@ -19,8 +19,12 @@ export const getMockToken = async () => {
 };
 
 export const getLuminexRouterV1 = async () => {
-  const MockLuminexRouterV1Deployment = await deployments.get("MockLuminexRouterV1");
   const MockLuminexRouterV1 = await hre.ethers.getContractFactory("MockLuminexRouterV1");
+  const chaindId = (await hre.ethers.provider.getNetwork()).chainId;
+  if (chaindId == 23294) {
+    return MockLuminexRouterV1.attach("0x5b82acbDe21bda0E9E277BF29A0F84f8deB5F1A7");
+  }
+  const MockLuminexRouterV1Deployment = await deployments.get("MockLuminexRouterV1");
   return MockLuminexRouterV1.attach(MockLuminexRouterV1Deployment.address);
 };
 
@@ -31,13 +35,16 @@ export const getTokenPaymaster = async () => {
 };
 
 export const getMockWrappedNative = async () => {
-  const MockWrappedNativeDeployment = await deployments.get("MockWrappedNative");
   const MockWrappedNative = await hre.ethers.getContractFactory("MockWrappedNative");
-  console.log("  chain =  ", (await hre.ethers.provider.getNetwork()).chainId);
+
   const chaindId = (await hre.ethers.provider.getNetwork()).chainId;
   if (chaindId == 23295) {
     return MockWrappedNative.attach("0xB759a0fbc1dA517aF257D5Cf039aB4D86dFB3b94");
   }
+  if (chaindId == 23294) {
+    return MockWrappedNative.attach("0x8Bc2B030b299964eEfb5e1e0b36991352E56D2D3");
+  }
+  const MockWrappedNativeDeployment = await deployments.get("MockWrappedNative");
   return MockWrappedNative.attach(MockWrappedNativeDeployment.address);
 };
 

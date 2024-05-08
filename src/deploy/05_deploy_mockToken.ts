@@ -15,5 +15,5 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-deploy.tags = ["sapphire-localnet", "sapphire-testnet"];
+deploy.tags = ["sapphire-localnet", "sapphire-testnet", "hardhat"];
 export default deploy;
