@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.17;
 
-import "./interfaces/IKeyManagementAuthorizationModule.sol";
+import "./interfaces/IAuthorizationModulesKMM.sol";
 
 import {SignatureRSV, EthereumUtils} from "@oasisprotocol/sapphire-contracts/contracts/EthereumUtils.sol";
 import {UserOperation} from "@account-abstraction/contracts/interfaces/UserOperation.sol";
@@ -14,32 +14,55 @@ contract KeyManagement is BaseAuthorizationModule {
 
     address internal constant SENTINEL_MODULES = address(0x1);
 
-    mapping(address => address) internal _modules;
+    mapping(address => mapping(address => address)) public _modules;
     mapping(address => address) internal publicAddress;
     mapping(address => bytes32) private privateSecret;
 
-    bool private _initialized;
-
     error WrongValidationModule(address validationModule);
 
-    constructor() {}
-
-    function initForSmartAccount(address _owner) external returns (address) {
-        require(!_initialized, "AlreadyInitialized");
+    function initForSmartAccount() external returns (address) {
         address keypairAddress;
         bytes32 keypairSecret;
         (keypairAddress, keypairSecret) = EthereumUtils.generateKeypair();
-        publicAddress[_owner] = keypairAddress;
-        privateSecret[_owner] = keypairSecret;
+        publicAddress[msg.sender] = keypairAddress;
+        privateSecret[msg.sender] = keypairSecret;
         return address(this);
     }
 
-    modifier onlyOwner(bytes calldata data) {
-        (, address validationModule) = abi.decode(data, (bytes, address));
-        if (_modules[validationModule] != address(0)) {
+    function _setupModule(
+        address setupContract,
+        bytes memory setupData
+    ) internal returns (address module) {
+        if (setupContract == address(0)) revert("Wrong Module Setup Address");
+        assembly {
+            let success := call(
+                gas(),
+                setupContract,
+                0,
+                add(setupData, 0x20),
+                mload(setupData),
+                0,
+                0
+            )
+            let ptr := mload(0x40)
+            returndatacopy(ptr, 0, returndatasize())
+            if iszero(success) {
+                revert(ptr, returndatasize())
+            }
+            module := mload(ptr)
+        }
+    }
+
+    modifier onlyOwner(bytes calldata data, address smartAccount) {
+        (bytes memory moduleData, address validationModule) = abi.decode(
+            data,
+            (bytes, address)
+        );
+        if (_modules[msg.sender][validationModule] != address(0)) {
             require(
-                IKeyManagementAuthorizationModule(validationModule).validate(
-                    data
+                IAuthorizationModulesKMM(validationModule).validate(
+                    moduleData,
+                    smartAccount
                 ) == true,
                 "Validate wrong"
             );
@@ -56,10 +79,8 @@ contract KeyManagement is BaseAuthorizationModule {
     )
         public
         view
-        returns (
-            // onlyOwner(authenticationData, smartAccount)
-            SignatureRSV memory
-        )
+        onlyOwner(authenticationData, smartAccount)
+        returns (SignatureRSV memory)
     {
         return
             EthereumUtils.sign(
