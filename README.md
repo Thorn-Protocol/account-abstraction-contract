@@ -7,7 +7,8 @@ $ cd account-abstraction-contract
 $ npm install --save-dev --force
 ```
 ### Config url and ENVIRONMENT_VARIABLE in .env
-<!-- TODO -->
+- Copy and update from .env_example_oasis_sapphire_testnet for sapphire testnet network
+- Copy and update from .env_example_oasis_sapphire_mainnet for sapphire oasis network
 
 ## Table of contents 
 1. [Overview](#overview)
