@@ -8,7 +8,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const smartAccountImplementation = await getSmartAccountImplementation();
-
+  console.log(" deploying SmartAccountFactory with smartAccountImplementation: ", smartAccountImplementation.address);
+  console.log(" deploying SmartAccountFactory with deployer: ", deployer);
   await deploy("SmartAccountFactory", {
     from: deployer,
     args: [smartAccountImplementation.address, deployer],

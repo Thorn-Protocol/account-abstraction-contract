@@ -10,10 +10,11 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const entryPoint = await getEntryPoint();
-
+  console.log(" deploying TokenPaymaster with entryPoint: ", entryPoint.address);
   const wrappedNative = await getMockWrappedNative();
+  console.log(" deploying TokenPaymaster with wrappedNative: ", wrappedNative.address);
   const luminexRouterV1 = await getLuminexRouterV1();
-
+  console.log(" deploying TokenPaymaster with luminexRouterV1: ", luminexRouterV1.address);
   const tokenPaymasterConfig: TokenPaymaster.TokenPaymasterConfigStruct = {
     refundPostopCost: 40000,
     minSwapAmount: parseEther("1"),

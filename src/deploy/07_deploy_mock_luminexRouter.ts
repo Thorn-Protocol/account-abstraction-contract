@@ -12,8 +12,8 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     args: [wrappedNative.address],
     log: true,
-    //deterministicDeployment: true,
-    skipIfAlreadyDeployed: true,
+    deterministicDeployment: true,
+    //skipIfAlreadyDeployed: true,
     autoMine: true,
   });
 };
