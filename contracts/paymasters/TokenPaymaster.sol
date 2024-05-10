@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "./utils/LuminexSwapHelper.sol";
+import "hardhat/console.sol";
 
 /**
  * @title TokenPaymaster
@@ -41,6 +42,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
 
     event UserOperationSponsored(
         address indexed user,
+        address token,
         uint256 actualTokenCharge,
         uint256 actualGasCost
     );
@@ -196,6 +198,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         bytes calldata context,
         uint256 actualGasCost
     ) internal override {
+        console.log("hahaha");
         unchecked {
             (
                 uint256 preCharge,
@@ -222,6 +225,10 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 );
             }
 
+            console.log(" token: %s", token);
+            console.log("preCharge: %s", preCharge);
+            console.log("actualUserOpFeePerGas: %s", actualTokenNeeded);
+
             if (preCharge > actualTokenNeeded) {
                 // If the initially provided token amount is greater than the actual amount needed, refund the difference
                 SafeERC20.safeTransfer(
@@ -239,9 +246,10 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                     actualTokenNeeded - preCharge
                 );
             }
-
+            console.log(" emit event");
             emit UserOperationSponsored(
                 userOpSender,
+                token,
                 actualTokenNeeded,
                 actualGasCost
             );
