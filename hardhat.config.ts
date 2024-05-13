@@ -83,8 +83,9 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 31337,
       accounts: TEST_HDWALLET,
-      tags: ["hardhat"],
+      live: false,
       initialBaseFeePerGas: 100e9,
+      tags: ["hardhat"],
     },
     "sapphire-mainnet": {
       url: "https://sapphire.oasis.io",

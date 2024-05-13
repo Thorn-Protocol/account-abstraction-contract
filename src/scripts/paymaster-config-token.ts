@@ -7,7 +7,7 @@ export async function enableToken(address: string) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   //const paymaster = await getTokenPaymaster();
-  const paymaster = TokenPaymaster__factory.connect("0x1376Be43d4FCfb362474EA6acF80Bd6E982E25b7", hre.ethers.provider);
+  const paymaster = TokenPaymaster__factory.connect("0x075FaF35b3EA69B771CB15Cd9bbd6d5da69b513c", hre.ethers.provider);
   const wallet = await hre.ethers.getSigner(deployer);
   console.log("enabling........");
   const tx = await (await paymaster.connect(wallet).addERC20Support(address)).wait();

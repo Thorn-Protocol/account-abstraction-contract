@@ -23,19 +23,19 @@ async function paymasterDashboard() {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   //const paymaster = await getTokenPaymaster();
-  const paymaster = TokenPaymaster__factory.connect("0x1376Be43d4FCfb362474EA6acF80Bd6E982E25b7", hre.ethers.provider);
+  const paymaster = TokenPaymaster__factory.connect("0x075FaF35b3EA69B771CB15Cd9bbd6d5da69b513c", hre.ethers.provider);
   const wrappedNative = await paymaster.wrappedNative();
   console.log(" native token = ", wrappedNative);
   const listTokenSupport = await paymaster.getListTokenSupport();
   console.log(" list = ", listTokenSupport);
 
   //    const entryPoint = await getEntryPoint();
-  const entryPoint = EntryPoint__factory.connect("0xf0B1274232343EDe4960Eb6Cfd7137Ae55D3751B", await hre.ethers.getSigner(deployer));
+  const entryPoint = EntryPoint__factory.connect("0x90cf31349Bc09Fb7eBBcdEbFaB61940030ecd696", await hre.ethers.getSigner(deployer));
 
   let balanceOfPaymaster = formatEther(await entryPoint.balanceOf(paymaster.address));
   if (Number(balanceOfPaymaster) < 0.5) {
     //deposit for paymaster
-    await (await entryPoint.depositTo(paymaster.address, { value: parseEther("10") })).wait();
+    await (await entryPoint.depositTo(paymaster.address, { value: parseEther("1") })).wait();
   }
   balanceOfPaymaster = formatEther(await entryPoint.balanceOf(paymaster.address));
   console.log(" balance Paymaster in Entrypoint", balanceOfPaymaster);
