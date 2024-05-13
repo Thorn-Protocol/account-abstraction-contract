@@ -117,8 +117,14 @@ describe("Token Paymaster", function () {
     const beneficiaryAddress = "0x".padEnd(42, "1");
     console.log("sending tx to entrypoint........");
     const tx = await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 });
-    console.log("Tx = ", (await tx.wait()).events);
+    const data = await tx.wait();
+    console.log("data = ", data.events);
+    // console.log("Tx = ", data);
+    //console.log("Tx = ", data.events);
+
+    // console.log(" logs = ", await ethers.provider.getTransactionReceipt(data.transactionHash));
     amountTokenInAA = formatUnits(await tokenPaymaster.balanceOf(userSA.address), await tokenPaymaster.decimals());
+    const logs = data.events?.filter((event) => event.event === "Transfer");
     console.log(" token Amount after tranfer:", amountTokenInAA);
     console.log(" balance of paymaster after tranfer ", (await entryPoint.getDepositInfo(paymaster.address)).deposit);
   });

@@ -228,7 +228,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             console.log(" token: %s", token);
             console.log("preCharge: %s", preCharge);
             console.log("actualUserOpFeePerGas: %s", actualTokenNeeded);
-
+            console.log(" userOpSender", userOpSender);
             if (preCharge > actualTokenNeeded) {
                 // If the initially provided token amount is greater than the actual amount needed, refund the difference
                 SafeERC20.safeTransfer(
@@ -291,6 +291,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     }
 
     receive() external payable {
+        console.log(" emit event 2");
         emit Received(msg.sender, msg.value);
     }
 
