@@ -8,7 +8,7 @@ import { EntryPoint__factory } from "@account-abstraction/contracts";
 async function updateConfig() {
     const tokenPaymasterConfig: TokenPaymaster.TokenPaymasterConfigStruct = {
         refundPostopCost: 40000,
-        minSwapAmount: parseEther("5"),
+        minSwapAmount: parseEther("50"),
     };
     const paymaster = await getTokenPaymaster();
 
@@ -52,10 +52,19 @@ async function paymasterDashboard() {
 
     console.log(" balance of token in dex = ", formatUnits(await erc20.balanceOf(dex), 6));
 
-    const confif = await paymaster.tokenPaymasterConfig();
+    const confif = await paymaster.connect(deployer).tokenPaymasterConfig();
 
     console.log(" config = ", confif);
 
+    const tokenPaymasterConfig: TokenPaymaster.TokenPaymasterConfigStruct = {
+        refundPostopCost: 40000,
+        minSwapAmount: parseEther("50"),
+    };
+
+    const tx = await (await paymaster.connect(await hre.ethers.getSigner(deployer)).setTokenPaymasterConfig(tokenPaymasterConfig)).wait();
+
+    const data = await paymaster.tokenPaymasterConfig();
+    console.log(" data = ", data);
     // await updateConfig();
     //await enableToken("0x1DD8219c8A8f2fF453fd19F775e3dA8c0501E768");
 }

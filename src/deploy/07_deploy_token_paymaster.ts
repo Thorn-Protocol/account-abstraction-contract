@@ -25,7 +25,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         args: [entryPoint.address, wrappedNative.address, luminexRouterV1.address, tokenPaymasterConfig, deployer],
         log: true,
         deterministicDeployment: true,
-        //skipIfAlreadyDeployed: true,
+
         autoMine: true,
     });
 };

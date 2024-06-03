@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract MockLuminexRouterV1 {
     address public immutable wrappedNative;
@@ -23,6 +24,15 @@ contract MockLuminexRouterV1 {
         uint deadline
     ) external returns (uint[] memory amounts) {
         uint8 decimal = ERC20(path[0]).decimals();
+
+        // get token
+        SafeERC20.safeTransferFrom(
+            IERC20(path[0]),
+            msg.sender,
+            address(this),
+            amountIn
+        );
+        // transfer native
         if (decimal == 6) {
             safeTransferNative(msg.sender, amountIn * 1e12);
         } else {

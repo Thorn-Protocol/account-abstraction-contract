@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 import "../interfaces/ILuminexRouterV1.sol";
 import "../interfaces/IWrappedNative.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title LuminexSwapHelper
@@ -57,6 +58,10 @@ abstract contract LuminexSwapHelper {
         address[] memory path = new address[](2);
         path[0] = token;
         path[1] = wrappedNative;
+
+        //approve token
+        SafeERC20.safeApprove(IERC20(token), luminexRouterV1, amountIn);
+        //swap token
         ILuminexRouterV1(luminexRouterV1).swapExactTokensForROSE(
             amountIn,
             0,

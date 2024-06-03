@@ -82,6 +82,8 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             tokenToOrdinal[token] = totalToken;
             ordinalToToken[totalToken] = token;
             tokenSupport[token] = true;
+
+            //set approve token for dex
         } else {
             // change state
             countTokenSupport++;
@@ -197,7 +199,6 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         bytes calldata context,
         uint256 actualGasCost
     ) internal override {
-        console.log("hahaha");
         unchecked {
             (
                 uint256 preCharge,
