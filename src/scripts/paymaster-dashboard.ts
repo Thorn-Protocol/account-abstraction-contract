@@ -58,7 +58,6 @@ async function paymasterDashboard() {
     const { deployer } = await getNamedAccounts();
     const dex = await paymaster.luminexRouterV1();
     console.log(" address luminexRoute ", dex);
-
     let balanceOfPaymaster = Number(formatEther(await entryPoint.balanceOf(paymaster.address)));
     if (Number(balanceOfPaymaster) < 0.5) {
         await (await entryPoint.depositTo(paymaster.address, { value: parseEther("10") })).wait();

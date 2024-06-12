@@ -34,7 +34,6 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
 
     uint256 public countTokenSupport;
     uint256 public totalToken;
-
     address[] public listTokenSupport;
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
@@ -60,11 +59,16 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         IEntryPoint _entryPoint,
         IERC20 _wrappedNative,
         ILuminexRouterV1 _luminexRouterV1,
+        IPrivateWrapperFactory _privateWrapperFactory,
         TokenPaymasterConfig memory _tokenPaymasterConfig,
         address _owner
     )
         BasePaymaster(_entryPoint)
-        LuminexSwapHelper(address(_luminexRouterV1), address(_wrappedNative))
+        LuminexSwapHelper(
+            address(_luminexRouterV1),
+            address(_privateWrapperFactory),
+            address(_wrappedNative)
+        )
     {
         setTokenPaymasterConfig(_tokenPaymasterConfig);
         transferOwnership(_owner);
@@ -74,7 +78,6 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     /// @param token The address of the ERC20 token to be supported.
     function addERC20Support(address token) public onlyOwner {
         if (tokenSupport[token]) revert("token was enabled");
-
         if (tokenToOrdinal[token] == 0) {
             // add new token
             totalToken++;
@@ -82,7 +85,6 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             tokenToOrdinal[token] = totalToken;
             ordinalToToken[totalToken] = token;
             tokenSupport[token] = true;
-
             //set approve token for dex
         } else {
             // change state
@@ -211,7 +213,6 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
             uint256 actualChargeNative = actualGasCost +
                 tokenPaymasterConfig.refundPostopCost *
                 actualUserOpFeePerGas;
-
             uint256 actualTokenNeeded = 0;
 
             // if the token is wrapped native token, the actual token needed is the actual native token charged
@@ -299,5 +300,12 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     ) external onlyOwner {
         (bool success, ) = recipient.call{value: amount}("");
         require(success, "withdraw failed");
+    }
+
+    function withdrawEthFromEntryPoint(
+        address payable withdrawAddress,
+        uint256 amount
+    ) public onlyOwner {
+        entryPoint.withdrawTo(withdrawAddress, amount);
     }
 }
