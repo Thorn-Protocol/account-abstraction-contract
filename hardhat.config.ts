@@ -6,7 +6,7 @@ import "hardhat-deploy";
 import "hardhat-dependency-compiler";
 // import "hardhat-tracer";
 import dotenv from "dotenv";
-import deploy from "./src/deploy/01_deploy_entrypoint";
+
 dotenv.config();
 
 const TEST_HDWALLET = {
@@ -75,13 +75,13 @@ const config: HardhatUserConfig = {
             signedTx: "0xf8a78085174876e800830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf382b620a0322f1c093633d4d1ace847573bf236ba2f66210952824ac47d65b445fedfb985a058b9dbaf0a2f88df0116ceb3d49b489ca7d5e72932802ac12885dc0e3ada3903",
         },
     },
-    defaultNetwork: "sapphire-testnet",
+    defaultNetwork: "hardhat",
     networks: {
         hardhat: {
             chainId: 31337,
             accounts: TEST_HDWALLET,
             tags: ["hardhat"],
-            initialBaseFeePerGas: 100e9,
+            // initialBaseFeePerGas: 100e9,
         },
         "sapphire-mainnet": {
             url: "https://sapphire.oasis.io",

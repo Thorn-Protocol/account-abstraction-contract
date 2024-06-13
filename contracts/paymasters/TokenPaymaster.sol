@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "./utils/LuminexSwapHelper.sol";
+import "hardhat/console.sol";
 
 /**
  * @title TokenPaymaster
@@ -165,6 +166,7 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 (refundPostopCost * maxFeePerGas);
             address token = address(bytes20(userOp.paymasterAndData[52:72]));
             uint256 tokenAmount = 0;
+
             if (token == address(wrappedNative)) {
                 tokenAmount = preChargeNative;
             } else {
@@ -277,12 +279,13 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 token,
                 tokenBalance
             );
-
             if (estimateReceiveNative > tokenPaymasterConfig.minSwapAmount) {
                 _swapTokenToNative(token, tokenBalance);
-                entryPoint.depositTo{value: address(this).balance}(
-                    address(this)
-                );
+                // uint balance = address(this).balance;
+                // console.log("balance", balance);
+                // entryPoint.depositTo{value: address(this).balance}(
+                //     address(this)
+                // );
             }
         }
     }

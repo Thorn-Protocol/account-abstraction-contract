@@ -28,6 +28,18 @@ export const getLuminexRouterV1 = async () => {
     return MockLuminexRouterV1.attach(MockLuminexRouterV1Deployment.address);
 };
 
+export const getMockBalanceRegistry = async () => {
+    const ConfidentialBalanceRegistry = await hre.ethers.getContractFactory("ConfidentialBalanceRegistry");
+    const ConfidentialBalanceRegistryDeployment = await deployments.get("ConfidentialBalanceRegistry");
+    return ConfidentialBalanceRegistry.attach(ConfidentialBalanceRegistryDeployment.address);
+};
+
+export const getMockPrivateWrapperFactory = async () => {
+    const PrivateWrapperFactory = await hre.ethers.getContractFactory("PrivateWrapperFactory");
+    const PrivateWrapperFactoryDeployment = await deployments.get("PrivateWrapperFactory");
+    return PrivateWrapperFactory.attach(PrivateWrapperFactoryDeployment.address);
+};
+
 export const getTokenPaymaster = async () => {
     const TokenPaymasterDeployment = await deployments.get("TokenPaymaster");
     const TokenPaymaster = await hre.ethers.getContractFactory("TokenPaymaster");
@@ -57,12 +69,6 @@ export const getEcdsaOwnershipRegistryModule = async () => {
     const EcdsaOwnershipRegistryModule = await hre.ethers.getContractFactory("EcdsaOwnershipRegistryModule");
     return EcdsaOwnershipRegistryModule.attach(EcdsaOwnershipRegistryModuleDeployment.address);
 };
-
-// export const getSmartAccountFactory = async () => {
-//   const SAFactoryDeployment = await deployments.get("SmartAccountFactory");
-//   console.log("hre = ", await ethers.provider.getBlockNumber());
-//   return SmartAccountFactory__factory.connect(SAFactoryDeployment.address, ethers.provider);
-// };
 
 export const getSmartAccountFactory = async () => {
     const SAFactoryDeployment = await deployments.get("SmartAccountFactory");

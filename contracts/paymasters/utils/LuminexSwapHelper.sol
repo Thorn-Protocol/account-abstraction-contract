@@ -6,6 +6,7 @@ import "../interfaces/IWrappedNative.sol";
 import "../interfaces/IPrivateWrapper.sol";
 import "../interfaces/IPrivateWrapperFactory.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "hardhat/console.sol";
 
 /**
  * @title LuminexSwapHelper
@@ -42,6 +43,7 @@ abstract contract LuminexSwapHelper {
             wrappedNative
         );
         path[1] = IPrivateWrapperFactory(privateWrapperFactory).wrappers(token);
+
         uint256[] memory result = ILuminexRouterV1(luminexRouterV1)
             .getAmountsOut(amountIn, path);
         amountOut = result[1];
@@ -76,17 +78,18 @@ abstract contract LuminexSwapHelper {
             .wrappers(wrappedNative);
 
         // convert token to private token
+        IERC20(token).approve(privateToken, amountIn);
         IPrivateWrapper(privateToken).wrap(amountIn, address(this));
-
-        //approve private token
-        SafeERC20.safeApprove(IERC20(privateToken), luminexRouterV1, amountIn);
 
         address[] memory path = new address[](2);
         path[0] = privateToken;
         path[1] = privateNative;
 
-        //swap token to native use DEX
-        ILuminexRouterV1(luminexRouterV1).swapExactTokensForROSE(
+        //approve private token
+        IERC20(privateToken).approve(luminexRouterV1, amountIn);
+
+        //swap private token to private native use DEX
+        ILuminexRouterV1(luminexRouterV1).swapExactTokensForTokens(
             amountIn,
             0,
             path,
@@ -99,6 +102,12 @@ abstract contract LuminexSwapHelper {
             IPrivateWrapper(privateNative).balanceOf(address(this)),
             address(this)
         );
+
+        // unwrapWeth(IERC20(wrappedNative).balanceOf(address(this)));
+
+        //  uint balanceNative = address(this).balance;
+
+        //  console.log("Balance native in paymaster after unwrap ", balanceNative);
     }
 
     /// @notice unwrap WETH by withdrawing
