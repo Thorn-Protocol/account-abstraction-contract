@@ -19,22 +19,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         minSwapAmount: parseEther("1"),
     };
 
-    console.log("                 🍄 entryPoint       :: ", colors.blue(entryPoint.address));
-    console.log("                 🍄 wrappedNative    :: ", colors.blue(wrappedNative.address));
-    console.log("                 🍄 luminexRouterV1  :: ", colors.blue(luminexRouterV1.address));
-    console.log("                 🍄 privateWrapperFactory  :: ", colors.blue(luminexRouterV1.address));
-    console.log("                 🍄 tokenPaymasterConfig  :: ", tokenPaymasterConfig);
-    console.log("                 🍄 deployer  :: ", colors.blue(deployer));
-
     const tx = await deploy("TokenPaymaster", {
         from: deployer,
         args: [entryPoint.address, wrappedNative.address, luminexRouterV1.address, privateWrapperFactory, tokenPaymasterConfig, deployer],
-        log: false,
+        log: true,
         deterministicDeployment: true,
         autoMine: true,
     });
-    console.log(" 🚀 Deploy TokenPaymaster at :: ", colors.green(tx.address));
-    console.log(" 🧾 Transaction hash tx: ", colors.blue(tx.receipt?.transactionHash!));
 };
+
 deploy.tags = ["hardhat"];
 export default deploy;

@@ -5,6 +5,8 @@ import { formatEther, formatUnits, parseEther, parseUnits } from "ethers/lib/uti
 import { makeEcdsaModuleUserOp, makeEcdsaModuleUserOpWithPaymaster, signUserOp } from "../../src/utils/userOp";
 import { PrivateERC20__factory, TokenPaymaster } from "../../typechain-types";
 import colors from "colors";
+import { token } from "../../typechain-types/@openzeppelin/contracts";
+import { expect } from "chai";
 
 describe("Token Paymaster", function () {
     let deployer: SignerWithAddress;
@@ -31,6 +33,9 @@ describe("Token Paymaster", function () {
         const ecdsaOwnershipSetupData = EcdsaOwnershipRegistryModule.interface.encodeFunctionData("initForSmartAccount", [await deployer.getAddress()]);
         const smartAccountDeploymentIndex = 0;
         const wrappedNative = await getMockWrappedNative();
+
+        await wrappedNative.deposit({ value: parseEther("100") });
+
         const userSA = await getSmartAccountWithModule(ecdsaModule.address, ecdsaOwnershipSetupData, smartAccountDeploymentIndex);
 
         let nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
@@ -101,15 +106,14 @@ describe("Token Paymaster", function () {
         const beneficiaryAddress = "0x".padEnd(42, "1");
         let nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
         console.log("-- BEFORE --");
-        console.log("native amount before tranfer:", colors.yellow(nativeInAA));
+        console.log("native token userSA:", colors.yellow(nativeInAA));
         console.log("-- EXECUTE --");
-        let balanceBundler = formatEther(await ethers.provider.getBalance(deployer.address));
-        console.log(" balance bundler before tranfer ", colors.yellow(balanceBundler));
+        let balanceBundlerBefore = formatEther(await ethers.provider.getBalance(deployer.address));
         const tx = await entryPoint.connect(deployer).handleOps([userOp], deployer.address, { gasLimit: 15e6 });
         const data = await tx.wait();
-        balanceBundler = formatEther(await ethers.provider.getBalance(deployer.address));
+        let balanceBundlerAfter = formatEther(await ethers.provider.getBalance(deployer.address));
+        expect(Number(balanceBundlerAfter)).to.be.greaterThan(Number(balanceBundlerBefore));
         console.log(" transaction gas ", data.gasUsed.toNumber());
-        console.log(" balance bundler after tranfer ", colors.yellow(balanceBundler));
         nativeInAA = formatEther(await ethers.provider.getBalance(userSA.address));
         console.log("-- AFTER --");
         console.log("native amount after tranfer:", colors.yellow(nativeInAA));
@@ -130,14 +134,15 @@ describe("Token Paymaster", function () {
         console.log("wrappedNative of userSA: ", colors.yellow(wrappedNativeInAA));
         console.log("balance wrappedNative of paymaster: ", colors.yellow(wrappedNativeInPaymaster));
         console.log("balance of paymaster in Entrypoint: ", colors.yellow(balanceNativePaymasterInEntryPoint));
-        const beneficiaryAddress = "0x".padEnd(42, "1");
         console.log("sending tx to entrypoint........");
-        const tx = await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 });
+        let balanceBundlerBefore = formatEther(await ethers.provider.getBalance(deployer.address));
+        const tx = await entryPoint.connect(deployer).handleOps([userOp], deployer.address, { gasLimit: 15e6 });
+        let balanceBundlerAfter = formatEther(await ethers.provider.getBalance(deployer.address));
+        expect(Number(balanceBundlerAfter)).to.be.greaterThan(Number(balanceBundlerBefore));
         console.log(" ⛽️ transaction gas ", (await tx.wait()).gasUsed.toNumber());
         wrappedNativeInAA = formatEther(await wrappedNative.balanceOf(userSA.address));
         balanceNativePaymasterInEntryPoint = formatEther(await entryPoint.balanceOf(paymaster.address));
         wrappedNativeInPaymaster = formatEther(await wrappedNative.balanceOf(paymaster.address));
-
         console.log("-- AFTER --");
         console.log("wrappedNative of userSA :", colors.yellow(wrappedNativeInAA));
         console.log("balance wrappedNative of paymaster: ", colors.yellow(wrappedNativeInPaymaster));
@@ -156,32 +161,36 @@ describe("Token Paymaster", function () {
         let amountTokenInAA = formatUnits(await tokenPaymaster.balanceOf(userSA.address), await tokenPaymaster.decimals());
         let amountTokenInPaymaster = formatUnits(await tokenPaymaster.balanceOf(paymaster.address), await tokenPaymaster.decimals());
         let balanceNativePaymasterInEntryPoint = formatEther(await entryPoint.balanceOf(paymaster.address));
+        console.log("-- BEFORE --");
         console.log("token amount of userSA:", colors.yellow(amountTokenInAA));
         console.log("token amount of paymaster:", colors.yellow(amountTokenInPaymaster));
         console.log("balance of paymaster in Entrypoint:", colors.yellow(balanceNativePaymasterInEntryPoint));
-        //console.log(" balance of paymaster after tranfer ", (await entryPoint.getDepositInfo(paymaster.address)).deposit);
-        const beneficiaryAddress = "0x".padEnd(42, "1");
         console.log("sending tx to entrypoint........");
-        const tx = await (await entryPoint.connect(deployer).handleOps([userOp], beneficiaryAddress, { gasLimit: 15e6 })).wait();
-        console.log("transaction gas ", tx.gasUsed.toNumber());
+        let balanceBundlerBefore = formatEther(await ethers.provider.getBalance(deployer.address));
+        const tx = await (await entryPoint.connect(deployer).handleOps([userOp], deployer.address, { gasLimit: 15e6 })).wait();
+        let balanceBundlerAfter = formatEther(await ethers.provider.getBalance(deployer.address));
+        expect(Number(balanceBundlerAfter)).to.be.greaterThan(Number(balanceBundlerBefore));
+        console.log("transaction gas: ", tx.gasUsed.toNumber());
         amountTokenInAA = formatUnits(await tokenPaymaster.balanceOf(userSA.address), await tokenPaymaster.decimals());
         amountTokenInPaymaster = formatUnits(await tokenPaymaster.balanceOf(paymaster.address), await tokenPaymaster.decimals());
         balanceNativePaymasterInEntryPoint = formatEther(await entryPoint.balanceOf(paymaster.address));
+        console.log("-- AFTER --");
         console.log("token amount of userSA: ", colors.yellow(amountTokenInAA));
         console.log("token amount of Paymaster: ", colors.yellow(amountTokenInPaymaster));
         console.log("balance of paymaster in entrypoint: ", colors.yellow(balanceNativePaymasterInEntryPoint));
     });
 
-    it("Auto fill paymaster with DEX", async () => {
+    it("Auto fill ERC-20 paymaster with DEX", async () => {
         const { userSA, callData, entryPoint, accountOwner, ecdsaModule, paymaster, tokenPaymaster, luminexRouterV1, privateNative, privateToken } = await setupTests();
+
+        //update config set minSwapAmount = 0 to auto fill paymaster
         let config: TokenPaymaster.TokenPaymasterConfigStruct = {
             refundPostopCost: 40000,
             minSwapAmount: parseEther("0"),
         };
-        //update config
         await paymaster.setTokenPaymasterConfig(config);
+        await paymaster.setAutoRefill(true);
         config = await paymaster.tokenPaymasterConfig();
-
         await entryPoint.connect(deployer).depositTo(paymaster.address, { value: parseEther("1") });
         await deployer.sendTransaction({
             to: luminexRouterV1.address,
@@ -202,19 +211,18 @@ describe("Token Paymaster", function () {
         console.log("native balance in Paymaster = :", balanceNativeInPaymaster);
         console.log("token balance in Paymaster = :", balanceTokenInPaymaster);
         console.log("token balance in userSA = :", balanceTokenInUserSA);
-
         console.log(" -- EXECUTE -- ");
+
         const userOp = await makeEcdsaModuleUserOpWithPaymaster("execute", [deployer.address, 0, "0x"], userSA.address, deployer, entryPoint, ecdsaModule.address, paymaster, tokenPaymaster, {
             preVerificationGas: 50000,
         });
-        let balanceBundler = formatEther(await ethers.provider.getBalance(deployer.address));
-        console.log(" balance bundler before tranfer ", colors.yellow(balanceBundler));
-        const beneficiaryAddress = "0x".padEnd(42, "1");
+        let balanceBundlerBefore = formatEther(await ethers.provider.getBalance(deployer.address));
         const tx = await entryPoint.connect(deployer).handleOps([userOp], deployer.address, { gasLimit: 15e6 });
+
         const data = await tx.wait();
-        balanceBundler = formatEther(await ethers.provider.getBalance(deployer.address));
+        let balanceBundlerAfter = formatEther(await ethers.provider.getBalance(deployer.address));
+        expect(Number(balanceBundlerAfter)).to.be.greaterThan(Number(balanceBundlerBefore));
         console.log(" transaction gas ", data.gasUsed.toNumber());
-        console.log(" balance bundler before tranfer ", colors.yellow(balanceBundler));
 
         balancePrivateNativeInLuminexDEX = Number(formatEther(await privateNative.balanceOf(luminexRouterV1.address)));
         balancePrivateTokenInLuminexDEX = Number(formatUnits(await privateToken.balanceOf(luminexRouterV1.address), await tokenPaymaster.decimals()));
@@ -230,5 +238,23 @@ describe("Token Paymaster", function () {
         console.log("native balance in Paymaster = :", balanceNativeInPaymaster);
         console.log("token balance in Paymaster = :", balanceTokenInPaymaster);
         console.log("token balance in userSA = :", balanceTokenInUserSA);
+    });
+
+    it("handler refill Native Token", async () => {
+        const { userSA, callData, wrappedNative, entryPoint, accountOwner, ecdsaModule, paymaster, tokenPaymaster, luminexRouterV1, privateNative, privateToken } = await setupTests();
+        await wrappedNative.mint(paymaster.address, parseEther("2"));
+        expect((await wrappedNative.balanceOf(paymaster.address)).toString()).to.be.equal(parseEther("2").toString());
+        const tx = await (await paymaster.handleRefill(wrappedNative.address)).wait();
+        console.log("transaction gas: ", tx.gasUsed.toNumber());
+        expect((await entryPoint.balanceOf(paymaster.address)).toString()).to.be.equal(parseEther("2").toString());
+    });
+
+    it("Handler refill ERC-20 paymaster by Owner ", async () => {
+        const { userSA, callData, entryPoint, accountOwner, ecdsaModule, paymaster, tokenPaymaster, luminexRouterV1, privateNative, privateToken } = await setupTests();
+        await tokenPaymaster.mint(paymaster.address, parseUnits("2", 6));
+        expect((await tokenPaymaster.balanceOf(paymaster.address)).toString()).to.be.equal(parseUnits("2", 6).toString());
+        const tx = await (await paymaster.handleRefill(tokenPaymaster.address)).wait();
+        console.log("transaction gas: ", tx.gasUsed.toNumber());
+        expect((await entryPoint.balanceOf(paymaster.address)).toString()).to.be.equal(parseEther("2").toString());
     });
 });

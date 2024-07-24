@@ -17,14 +17,14 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         refundPostopCost: 40000,
         minSwapAmount: parseEther("10"),
     };
-    // await deploy("TokenPaymaster", {
-    //     from: deployer,
-    //     args: [entryPoint.address, wrappedNative.address, luminexRouterV1.address, privateWrapperFactory, tokenPaymasterConfig, deployer],
-    //     log: true,
-    //     deterministicDeployment: true,
+    await deploy("TokenPaymaster", {
+        from: deployer,
+        args: [entryPoint.address, wrappedNative.address, luminexRouterV1.address, privateWrapperFactory, tokenPaymasterConfig, deployer],
+        log: true,
+        deterministicDeployment: true,
 
-    //     autoMine: true,
-    // });
+        autoMine: true,
+    });
 };
 deploy.tags = ["sapphire-mainnet"];
 export default deploy;

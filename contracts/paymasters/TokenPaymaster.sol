@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@account-abstraction/contracts/core/BasePaymaster.sol";
 import "./utils/LuminexSwapHelper.sol";
-import "hardhat/console.sol";
 
 /**
  * @title TokenPaymaster
@@ -36,6 +35,8 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
     uint256 public countTokenSupport;
     uint256 public totalToken;
     address[] public listTokenSupport;
+
+    bool public autoRefill = false;
 
     event ConfigUpdated(TokenPaymasterConfig tokenPaymasterConfig);
 
@@ -253,8 +254,16 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
                 actualGasCost
             );
 
-            refillEntryPointDeposit(token);
+            if (autoRefill) refillEntryPointDeposit(token);
         }
+    }
+
+    function setAutoRefill(bool _autoRefill) public onlyOwner {
+        autoRefill = _autoRefill;
+    }
+
+    function handleRefill(address token) public {
+        refillEntryPointDeposit(token);
     }
 
     /// @notice If necessary this function uses this Paymaster's token balance to refill the deposit on EntryPoint
@@ -274,18 +283,16 @@ contract TokenPaymaster is BasePaymaster, LuminexSwapHelper {
         } else {
             // if the ERC20 token is not wrapped native token and paymaster's balance of that token is greater than minSwapAmount, swap and deposit to entry point
             uint256 tokenBalance = IERC20(token).balanceOf(address(this));
-
             uint256 estimateReceiveNative = estimateTokenToNative(
                 token,
                 tokenBalance
             );
             if (estimateReceiveNative > tokenPaymasterConfig.minSwapAmount) {
                 _swapTokenToNative(token, tokenBalance);
-                // uint balance = address(this).balance;
-                // console.log("balance", balance);
-                // entryPoint.depositTo{value: address(this).balance}(
-                //     address(this)
-                // );
+
+                entryPoint.depositTo{value: address(this).balance}(
+                    address(this)
+                );
             }
         }
     }

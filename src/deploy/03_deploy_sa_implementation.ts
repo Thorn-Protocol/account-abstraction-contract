@@ -8,7 +8,7 @@ const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployer } = await getNamedAccounts();
 
     const entryPoint = await getEntryPoint();
-    console.log(" deploying SmartAccount with entryPoint: ", entryPoint.address);
+
     await deploy("SmartAccount", {
         from: deployer,
         args: [entryPoint.address],

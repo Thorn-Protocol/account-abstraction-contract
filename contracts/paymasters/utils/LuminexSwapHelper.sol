@@ -6,7 +6,6 @@ import "../interfaces/IWrappedNative.sol";
 import "../interfaces/IPrivateWrapper.sol";
 import "../interfaces/IPrivateWrapperFactory.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "hardhat/console.sol";
 
 /**
  * @title LuminexSwapHelper
@@ -103,11 +102,7 @@ abstract contract LuminexSwapHelper {
             address(this)
         );
 
-        // unwrapWeth(IERC20(wrappedNative).balanceOf(address(this)));
-
-        //  uint balanceNative = address(this).balance;
-
-        //  console.log("Balance native in paymaster after unwrap ", balanceNative);
+        unwrapWeth(IERC20(wrappedNative).balanceOf(address(this)));
     }
 
     /// @notice unwrap WETH by withdrawing
