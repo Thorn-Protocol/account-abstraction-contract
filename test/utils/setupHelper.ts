@@ -42,13 +42,16 @@ export const getSmartAccountFactory = async () => {
     return smartAccountFactory;
 };
 
-export const getSmartAccountWithModule = async (moduleSetupContract: string, moduleSetupData: BytesLike, index: number) => {
+export const getSmartAccountWithModule = async (
+    moduleSetupContract: string,
+    moduleSetupData: BytesLike,
+    index: number
+) => {
     const factory = await getSmartAccountFactory();
-    //  console.log("factory = ", factory);
-    console.log("factory = ", factory.address, " moduleSetupContract = ", moduleSetupContract, " moduleSetupData", moduleSetupData, " index = ", index);
     const [deployer] = await ethers.getSigners();
-    const expectedSmartAccountAddress = await factory.connect(deployer).getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
-    console.log(" expect = ", expectedSmartAccountAddress);
+    const expectedSmartAccountAddress = await factory
+        .connect(deployer)
+        .getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
     await factory.deployCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
 
     return await hre.ethers.getContractAt("SmartAccount", expectedSmartAccountAddress);

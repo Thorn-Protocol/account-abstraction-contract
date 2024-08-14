@@ -1,4 +1,13 @@
-import { arrayify, BytesLike, defaultAbiCoder, hexConcat, hexDataSlice, hexValue, hexZeroPad, keccak256 } from "ethers/lib/utils";
+import {
+    arrayify,
+    BytesLike,
+    defaultAbiCoder,
+    hexConcat,
+    hexDataSlice,
+    hexValue,
+    hexZeroPad,
+    keccak256,
+} from "ethers/lib/utils";
 import { UserOperation } from "./userOperation";
 import { AddressZero, callDataCost, rethrow } from "./testUtils";
 import { BigNumber, BigNumberish, Contract, Signer, Wallet } from "ethers";
@@ -11,7 +20,18 @@ import { MerkleTree } from "merkletreejs";
 export function packUserOp(op: UserOperation, forSignature = true): string {
     if (forSignature) {
         return defaultAbiCoder.encode(
-            ["address", "uint256", "bytes32", "bytes32", "uint256", "uint256", "uint256", "uint256", "uint256", "bytes32"],
+            [
+                "address",
+                "uint256",
+                "bytes32",
+                "bytes32",
+                "uint256",
+                "uint256",
+                "uint256",
+                "uint256",
+                "uint256",
+                "bytes32",
+            ],
             [
                 op.sender,
                 op.nonce,
@@ -28,7 +48,19 @@ export function packUserOp(op: UserOperation, forSignature = true): string {
     } else {
         // for the purpose of calculating gas cost encode also signature (and no keccak of bytes)
         return defaultAbiCoder.encode(
-            ["address", "uint256", "bytes", "bytes", "uint256", "uint256", "uint256", "uint256", "uint256", "bytes", "bytes"],
+            [
+                "address",
+                "uint256",
+                "bytes",
+                "bytes",
+                "uint256",
+                "uint256",
+                "uint256",
+                "uint256",
+                "uint256",
+                "bytes",
+                "bytes",
+            ],
             [
                 op.sender,
                 op.nonce,
@@ -97,7 +129,10 @@ export const DefaultsForUserOp: UserOperation = {
 
 export function signUserOp(op: UserOperation, signer: Wallet, entryPoint: string, chainId: number): UserOperation {
     const message = getUserOpHash(op, entryPoint, chainId);
-    const msg1 = Buffer.concat([Buffer.from("\x19Ethereum Signed Message:\n32", "ascii"), Buffer.from(arrayify(message))]);
+    const msg1 = Buffer.concat([
+        Buffer.from("\x19Ethereum Signed Message:\n32", "ascii"),
+        Buffer.from(arrayify(message)),
+    ]);
 
     const sig = ecsign(keccak256Buffer(msg1), Buffer.from(arrayify(signer.privateKey)));
     // that's equivalent of:  await signer.signMessage(message);
@@ -135,7 +170,13 @@ export function fillUserOpDefaults(op: Partial<UserOperation>, defaults = Defaul
 // sender - only in case of construction: fill sender from initCode.
 // callGasLimit: VERY crude estimation (by estimating call to account, and add rough entryPoint overhead
 // verificationGasLimit: hard-code default at 100k. should add "create2" cost
-export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryPoint, getNonceFunction = "nonce", useNonceKey = true, nonceKey = 0): Promise<UserOperation> {
+export async function fillUserOp(
+    op: Partial<UserOperation>,
+    entryPoint?: EntryPoint,
+    getNonceFunction = "nonce",
+    useNonceKey = true,
+    nonceKey = 0
+): Promise<UserOperation> {
     const op1 = { ...op };
     const provider = entryPoint?.provider;
     if (op.initCode != null) {
@@ -151,7 +192,9 @@ export async function fillUserOp(op: Partial<UserOperation>, entryPoint?: EntryP
             } else {
                 // console.log('\t== not our deployer. our=', Create2Factory.contractAddress, 'got', initAddr)
                 if (provider == null) throw new Error("no entrypoint/provider");
-                op1.sender = await entryPoint!.callStatic.getSenderAddress(op1.initCode!).catch((e) => e.errorArgs.sender);
+                op1.sender = await entryPoint!.callStatic
+                    .getSenderAddress(op1.initCode!)
+                    .catch((e) => e.errorArgs.sender);
             }
         }
         if (op1.verificationGasLimit == null) {
@@ -274,7 +317,10 @@ export async function makeEcdsaModuleUserOp(
     );
     // console.log("userOP = ", userOp);
     // add validator module address to the signature
-    const signatureWithModuleAddress = ethers.utils.defaultAbiCoder.encode(["bytes", "address"], [userOp.signature, moduleAddress]);
+    const signatureWithModuleAddress = ethers.utils.defaultAbiCoder.encode(
+        ["bytes", "address"],
+        [userOp.signature, moduleAddress]
+    );
 
     userOp.signature = signatureWithModuleAddress;
     //  console.log("userOP = ", userOp);
@@ -323,7 +369,10 @@ export async function makeEcdsaModuleUserOpWithPaymaster(
             ...userOp,
             paymasterAndData: hexConcat([
                 paymaster.address,
-                ethers.utils.defaultAbiCoder.encode(["address", "uint48", "uint48", "bytes"], [verifiedSigner.address, validUntil, validAfter, paymasterSig]),
+                ethers.utils.defaultAbiCoder.encode(
+                    ["address", "uint48", "uint48", "bytes"],
+                    [verifiedSigner.address, validUntil, validAfter, paymasterSig]
+                ),
             ]),
         },
         userOpSigner,
@@ -335,7 +384,10 @@ export async function makeEcdsaModuleUserOpWithPaymaster(
     );
 
     // add validator module address to the signature
-    const signatureWithModuleAddress = ethers.utils.defaultAbiCoder.encode(["bytes", "address"], [userOpWithPaymasterData.signature, moduleAddress]);
+    const signatureWithModuleAddress = ethers.utils.defaultAbiCoder.encode(
+        ["bytes", "address"],
+        [userOpWithPaymasterData.signature, moduleAddress]
+    );
 
     userOpWithPaymasterData.signature = signatureWithModuleAddress;
 
@@ -373,9 +425,15 @@ export async function makeSARegistryModuleUserOp(
         0
     );
 
-    const signatureForSAOwnershipRegistry = ethers.utils.defaultAbiCoder.encode(["bytes", "address"], [userOp.signature, ecdsaModuleAddress]);
+    const signatureForSAOwnershipRegistry = ethers.utils.defaultAbiCoder.encode(
+        ["bytes", "address"],
+        [userOp.signature, ecdsaModuleAddress]
+    );
 
-    const signatureForECDSAOwnershipRegistry = ethers.utils.defaultAbiCoder.encode(["bytes", "address"], [signatureForSAOwnershipRegistry, saRegistryModuleAddress]);
+    const signatureForECDSAOwnershipRegistry = ethers.utils.defaultAbiCoder.encode(
+        ["bytes", "address"],
+        [signatureForSAOwnershipRegistry, saRegistryModuleAddress]
+    );
 
     userOp.signature = signatureForECDSAOwnershipRegistry;
     return userOp;
@@ -414,7 +472,11 @@ export async function makeMultichainEcdsaModuleUserOp(
         0
     );
 
-    const leafOfThisUserOp = hexConcat([hexZeroPad(ethers.utils.hexlify(validUntil), 6), hexZeroPad(ethers.utils.hexlify(validAfter), 6), hexZeroPad(await entryPoint.getUserOpHash(userOp), 32)]);
+    const leafOfThisUserOp = hexConcat([
+        hexZeroPad(ethers.utils.hexlify(validUntil), 6),
+        hexZeroPad(ethers.utils.hexlify(validAfter), 6),
+        hexZeroPad(await entryPoint.getUserOpHash(userOp), 32),
+    ]);
 
     leaves.push(leafOfThisUserOp);
     leaves = leaves.map((x) => ethers.utils.keccak256(x));
@@ -429,7 +491,10 @@ export async function makeMultichainEcdsaModuleUserOp(
     // but still required to pad the signature with the required data (unsigned) for every chain
     // this is done by dapp automatically
     const merkleProof = chainMerkleTree.getHexProof(leaves[leaves.length - 1]);
-    const moduleSignature = defaultAbiCoder.encode(["uint48", "uint48", "bytes32", "bytes32[]", "bytes"], [validUntil, validAfter, chainMerkleTree.getHexRoot(), merkleProof, multichainSignature]);
+    const moduleSignature = defaultAbiCoder.encode(
+        ["uint48", "uint48", "bytes32", "bytes32[]", "bytes"],
+        [validUntil, validAfter, chainMerkleTree.getHexRoot(), merkleProof, multichainSignature]
+    );
 
     // add validator module address to the signature
     const signatureWithModuleAddress = defaultAbiCoder.encode(["bytes", "address"], [moduleSignature, moduleAddress]);

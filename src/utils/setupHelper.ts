@@ -1,9 +1,15 @@
 import { EntryPoint__factory } from "@account-abstraction/contracts";
 import { HardhatEthersHelpers } from "@nomiclabs/hardhat-ethers/types";
 import { deployments, ethers } from "hardhat";
-import { KeyManagement__factory, SmartAccount__factory, SmartAccountFactory__factory } from "../../typechain-types";
+import { SmartAccount__factory, SmartAccountFactory__factory } from "../../typechain-types";
 import { BytesLike } from "ethers";
 import hre from "hardhat";
+
+export const getContract = async (name: string) => {
+    const contractDeployment = await deployments.get(name);
+    const contract = await hre.ethers.getContractFactory(name);
+    return contract.attach(contractDeployment.address);
+};
 
 export const getEntryPoint = async () => {
     const EntryPointDeployment = await deployments.get("EntryPoint");
@@ -77,18 +83,19 @@ export const getSmartAccountFactory = async () => {
     return smartAccountFactory;
 };
 
-export const getSmartAccountWithModule = async (moduleSetupContract: string, moduleSetupData: BytesLike, index: number) => {
+export const getSmartAccountWithModule = async (
+    moduleSetupContract: string,
+    moduleSetupData: BytesLike,
+    index: number
+) => {
     const factory = await getSmartAccountFactory();
     //  console.log("factory = ", factory);
     //console.log("factory = ", factory.address, " moduleSetupContract = ", moduleSetupContract, " moduleSetupData", moduleSetupData, " index = ", index);
     const [deployer] = await ethers.getSigners();
-    const expectedSmartAccountAddress = await factory.connect(deployer).getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
+    const expectedSmartAccountAddress = await factory
+        .connect(deployer)
+        .getAddressForCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
     //console.log(" expect = ", expectedSmartAccountAddress);
     await factory.deployCounterFactualAccount(moduleSetupContract, moduleSetupData, index);
     return await hre.ethers.getContractAt("SmartAccount", expectedSmartAccountAddress);
-};
-
-export const getKeyManagementImplementation = async () => {
-    const KeyManagementImplDeployment = await deployments.get("KeyManagement");
-    return KeyManagement__factory.connect(KeyManagementImplDeployment.address, ethers.provider);
 };
